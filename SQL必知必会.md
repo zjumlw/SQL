@@ -53,14 +53,16 @@ SQL语句由关键字构成，最常用的是SELECT语句。
 >作为SQL组成部分的保留字，不能用作表或列的名字。  
 
 使用SELECT检索表数据，至少需要给出两条信息：1.想选择什么，2.从什么地方选择。  
-### 2.2 检索单个列  
+### 2.2 检索单个列
+使用SELECT
 ```
 SELECT prod_name 
 FROM Products;
 ```  
 >多条SQL语句必须以分号分隔；  
 >SQL语句不区分大小写，表名、列名和值可能区分大小写；  
->所有的空格都被忽略，可以写在一行也可以分行。
+>所有的空格都被忽略，可以写在一行也可以分行。  
+
 ### 2.3 检索多个列  
 在select关键字后面给出多个列名，列名之间用逗号分隔。  
 ```
@@ -69,10 +71,11 @@ FROM Products;
 ```  
 ### 2.4 检索所有列  
 在实际列名的位置用星号代替。  
-```
-SELECT *
+``` 
+SELECT *  
 FROM Products;
 ```  
+
 > 使用星号通配符可以检索出名字未知的列。  
 
 ### 2.5 检索不同的值  
@@ -81,6 +84,166 @@ FROM Products;
 SELECT DISTINCT vend_id
 FROM Products;
 ```  
+### 2.6 限制结果  
+只检索前5行，在MySQL中的实现：
+```
+SELECT prod_name  
+FROM Products  
+LIMIT 5;
+```  
+检索第5行开始的前5行，在MySQL中的实现：
+```
+SELECT prod_name  
+FROM Products  
+LIMIT 5 OFFSET 5;
+```  
+> 第一个被检索的是第0行而不是第1行，因此LIMIT 1 OFFSET 1会检索第2行而不是第一行。  
+> 在MySQL中，LIMIT 3，4 == LIMIT 4 OFFSET 3  
+
+
+### 2.7 使用注释  
+行内注释：
+```
+/*来一条注释
+*/
+SELECT prod_name
+FROM Products;
+#这是一条注释
+```  
+## Chapter_3 排序检索数据  
+### 3.1 排序数据  
+如果不明确规定排序顺序，则不应该假定检索出的数据的顺序有任何意义。
+>**子句（clause）**  
+>一个子句由*1个*关键字和提供的数据组成。
+
+使用ORDER BY子句对输出按照字母顺序进行排序：
+```
+SELECT prod_name
+FROM Products
+ORDER BY prod_name;
+```  
+
+这里应保证ORDER BY子句是SELECT语句中的最后一条子句，否则会出现错误。  
+### 3.2 按多个列排序  
+指定列名，列名之间用逗号分开即可。以下首先按价格，然后按名称排序：
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY prod_price, prod_name;
+```
+### 3.3 按列位置排序  
+ORDER BY支持按相对列位置进行排序。
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY 2, 3;
+```  
+得到的结果与上一个命令一样，好处在于不用重新输入列名，缺点有：1.不明确给出列名可能造成错误；2.对SELECT清单进行更改会影响数据排序；3.如果进行排序的列不在SELECT清单中，不能使用这项技术。  
+### 3.4 指定排序方向  
+降序排序使用关键字DESC。
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY prod_price DESC;
+```  
+DESC关键字只应用到直接位于其前面的列名。
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+ORDER BY prod_price DESC, prod_name;
+```  
+这里先按照price降序，再按照name升序。  
+## Chapter_4 过滤数据  
+### 4.1 使用WHERE子句  
+检索所需数据需要指定搜索条件（过滤条件），数据根据WHERE子句中指定的搜索条件进行过滤，WHERE子句在表名（FROM子句）之后给出：
+```
+SELECT prod_name, prod_price
+FROM Products
+WHERE prod_price = 3.49;
+```  
+> 在同时使用ORDER BY和WHERE子句时，应该让ORDER BY位于WHERE之后，否则会产生错误。 
+
+### 4.2 WHERE子句操作符  
+大于 小于 等于 不等于 不大于 不小于 大于等于 小于等于 两者之间（BETWEEN） 为NULL值（IS NULL）  
+> 单引号用来限定字符串，数值不需要用引号。  
+
+使用BETWEEN必须指定两个值，低值和高值，并且用AND关键字分隔。BETWEEN匹配范围内所有值，包括边界值。
+```
+SELECT prod_name, prod_price
+FROM Products
+WHERE prod_price BETWEEN 5 AND 10;
+```  
+在一个列不包含值时，称其包含空值NULL。
+> **NULL**  
+> 无值（no value），与字段包含0、空字符串或者空格不同。
+
+检查空值用IS NULL子句：  
+```
+SELECT cust_name
+FROM Customers
+WHERE cust_email IS NULL;
+```  
+## Chapter_5 高级数据过滤  
+### 5.1 组合WHERE子句  
+SQL允许给出多个WHERE子句，以AND子句或者OR子句的方式使用。
+> **操作符（operator）**  
+> 用来联结或改变WHERE子句中的子句的关键字，也称为逻辑操作符（logical operator）。
+
+通过AND操作符给WHERE子句附加条件实现对不止一个列进行过滤。
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+WHERE vend_id = 'DLL01' AND prod_price <= 4;
+```
+通过OR操作符给WHERE子句附加条件实现匹配任一条件的行。
+```
+SELECT prod_id, prod_price, prod_name
+FROM Products
+WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
+```  
+AND操作符优先级大于OR操作符，可以用圆括号对操作符进行明确分组。
+```
+SELECT prod_name, prod_price
+FROM Products
+WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01') AND prod_price > 10;
+```
+### 5.2 IN操作符  
+IN操作符用来指定条件范围，范围中的每个条件都可以进行匹配。
+```
+SELECT prod_name, prod_price
+FROM Products
+WHERE vend_id IN ('DLL01', 'BRS01')
+ORDER BY prod_name;
+```  
+与OR有相同的功能，有如下优点：
+
+
+- 更清楚直观；
+- 在与AND和OR操作符组合使用IN，求值顺序容易管理；
+- IN比OR执行的更快；
+- 可以包含其他SELECT语句，能够动态地建立WHERE子句。
+
+### 5.3 NOT操作符  
+有且只有一个功能：否定其后所跟的任何条件。NOT从不单独使用，用在要过滤的列前，而不是在其后。
+> **NOT**  
+> WHERE子句中用来否定其后条件的关键字。
+
+```
+SELECT prod_name
+FROM Products
+WHERE NOT vend_id = 'DLL01'
+ORDER BY prod_name;
+```  
+与IN操作符联合使用，NOT可以非常简单找出与条件列表不匹配的行。  
+## Chapter_6 用通配符进行过滤  
+### 6.1 LIKE操作符  
+
+
+
+
+
+
+
 
 
 
