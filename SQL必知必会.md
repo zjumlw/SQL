@@ -1,5 +1,5 @@
 # SQL必知必会  
-## Chapter_1 了解SQL  
+## Chapter 1 了解SQL  
 ### 1.1 数据库基础
 数据库就是一个以某种有组织的方式存储的数据集合。
 > **数据库（database）**  
@@ -46,7 +46,7 @@ SQL的优点：
 - 简单易学；  
 - 灵活使用其语言元素，可以进行非常复杂和高级的数据库操作。 
  
-## Chapter_2 检索数据  
+## Chapter 2 检索数据  
 ### 2.1 SELECT语句  
 SQL语句由关键字构成，最常用的是SELECT语句。
 >**关键字（keyword）**  
@@ -110,7 +110,7 @@ SELECT prod_name
 FROM Products;
 #这是一条注释
 ```  
-## Chapter_3 排序检索数据  
+## Chapter 3 排序检索数据  
 ### 3.1 排序数据  
 如果不明确规定排序顺序，则不应该假定检索出的数据的顺序有任何意义。
 >**子句（clause）**  
@@ -153,7 +153,7 @@ FROM Products
 ORDER BY prod_price DESC, prod_name;
 ```  
 这里先按照price降序，再按照name升序。  
-## Chapter_4 过滤数据  
+## Chapter 4 过滤数据  
 ### 4.1 使用WHERE子句  
 检索所需数据需要指定搜索条件（过滤条件），数据根据WHERE子句中指定的搜索条件进行过滤，WHERE子句在表名（FROM子句）之后给出：
 ```
@@ -184,7 +184,7 @@ SELECT cust_name
 FROM Customers
 WHERE cust_email IS NULL;
 ```  
-## Chapter_5 高级数据过滤  
+## Chapter 5 高级数据过滤  
 ### 5.1 组合WHERE子句  
 SQL允许给出多个WHERE子句，以AND子句或者OR子句的方式使用。
 > **操作符（operator）**  
@@ -239,7 +239,7 @@ NOT从不单独使用，用在要过滤的列前，而不是在其后。
 
 
 与IN操作符联合使用，NOT可以非常简单找出与条件列表不匹配的行。  
-## Chapter_6 用通配符进行过滤  
+## Chapter 6 用通配符进行过滤  
 ### 6.1 LIKE操作符  
 构造通配符搜索模式。
 > **通配符（wildcard）**  
@@ -266,7 +266,7 @@ _通配符：只匹配单个字符，而不是多个字符。
 - 尽量不要放在搜索模式的开始处；
 - 注意通配符的位置。
 
-## Chapter_7 创建计算字段
+## Chapter 7 创建计算字段
 ### 7.1 计算字段
 计算字段并不实际存在与数据表中，是运行时在SELECT语句内创建的。
 > **字段（field）**
@@ -305,7 +305,7 @@ WHERE order_num = 20008;
 > 如果省略了FROM子句，SELECT能简单地访问和处理表达式， SELECT 2*3; 将返回6，SELECT Now()；将返回当前日期和时间。
 
 
-## Chapter_8 使用函数处理数据
+## Chapter 8 使用函数处理数据
 ### 8.1 函数
 不同DBMS的函数语法可能不同，SQL函数不是可移植的。
 MySQL中：
@@ -347,7 +347,7 @@ SIN() 正弦
 SQRT()平方根
 TAN() 正切
 
-## Chapter_9 汇总数据
+## Chapter 9 汇总数据
 ### 9.1 聚集函数
 汇总数据而不用把它们实际检索出来。
 - 确定表中行数；
@@ -430,7 +430,7 @@ FROM Products;
 > **取别名**
 > 在指定别名包含某个聚集函数的结果时，不应该使用表中实际的列名。
 
-## Chapter_10 分组数据
+## Chapter 10 分组数据
 ### 10.1 数据分组
 使用分组可以将数据分为多个逻辑组，对每个组进行聚集计算。
 ### 10.2 创建分组
@@ -472,7 +472,7 @@ HAVING COUNT(*) >=2;
 ```
 ### 10.4 分组和排序
 > **GROUP BY和ORDER BY的区别**  
-> GROUP BY：
+> GROUP BY：  
 > 1.对行分组，但是输出可能不是分组的顺序；  
 > 2.只可能使用选择列或表达式列，而且必须使用每个选择列表达式；  
 > 3.如果与聚集函数一起使用列，则必须使用。  
@@ -498,7 +498,7 @@ GROUP BY：分组说明
 HAVING：组级过滤  
 ORDER BY：输出排序顺序
 
-## Chapter_11 使用子查询
+## Chapter 11 使用子查询
 ### 11.1 子查询
 >**查询（query）**
 >任何SQL语句都是查询，但此术语一般指SELECT语句。
@@ -565,7 +565,7 @@ ORDER BY cust_name;
 > 在SELECT语句中操作多个表，就应该使用完全限定列名来避免歧义：
 > Orders.cust_id和Customers.cust_id。
 
-## Chapter_12 联结表
+## Chapter 12 联结表
 ### 12.1 联结
 SQL最强大的功能之一就是能在数据查询的执行中联结（join）表。  
 相同的数据出现多次不是好事，关系表的设计就是要把信息分解成多个表，一个数据一个表。各表通过某些共同的值互相关联。  
@@ -580,9 +580,46 @@ SELECT语句通过联结检索出存储在多个表中的数据。
 SELECT vend_name, prod_name, prod_price
 FROM Vendors, Products
 WHERE Vendors.vend_id = Products.vend_id;
+```   
+
+这里FROM子句列出了两个表：Vendors和Products，这就是联结的两个表。WHERE子句指示DBMS将Vendors表中的vend_id与Products表中的vend_id匹配起来。  
+
+> **完全限定列名**
+> 如果引用一个没有用表名限制的具有歧义的列名，大部分DBMS会返回错误。
+
+在联结两个表时，实际就是将第一个表中的每一行与第二个表中的每一行配对。WHERE子句作为过滤条件，只包含那些匹配给定条件（联结条件）的行。
+> **笛卡尔积（cartesian product）**
+> 没有联结条件的表关系返回的结果是笛卡尔积，是第一个表的行数乘以第二个表的行数。该联结也成为叉联结（cross join）。
+
+以上的联结称为等值联结（equijoin），也称为内联结（inner join）。可以明确指定联结的类型：
 ```
+SELECT vend_name, prod_name, prod_price
+FROM Vendors INNER JOIN Products
+ON Vendors.vend_id = Products.vend_id;
+```  
+得到结果与上个SELECT语句一样。
+SELECT语句可以联结多个表，联结的基本规则相同：首先列出所有表，然后定义表之间的关系：
+```
+SELECT prod_name, vend_name, prod_price, quantity
+FROM OrderItems, Products, Vendors
+WHERE Products.vend_id = Vendors.vend_id
+	AND OrderItems.prod_id = Products.prod_id
+	AND order_num = 20007;
+```  
+这里WHERE子句定义了两个联结条件对于三个表，第三个联结条件用来过滤订单20007中的物品。
+> 不要联结不必要的表，联结的表越多，性能下降越厉害。
 
+对于Chapter_11中的子查询，使用联结可以实现相同的功能：
+```
+SELECT cust_name, cust_contact
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+	AND OrderItems.order_num = Orders.order_num
+	AND prod_id = 'RGAN01';
+```  
 
+## Chapter 13 创建高级联结
+### 13.1 使用表别名
 
 
 
