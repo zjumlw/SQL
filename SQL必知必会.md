@@ -251,11 +251,177 @@ FROM Products
 WHERE prod_name LIKE 'FISH%';
 ```
 以上表示所有以fish开头的产品。
+> 通配符%不会匹配NULL。
+
+_通配符：只匹配单个字符，而不是多个字符。
+[]通配符：指定一个字符集，必须匹配指定位置的一个字符。（MySQL中不能使用）
+
+### 6.2 使用通配符的技巧
+技巧：
+- 不要过度使用通配符；
+- 尽量不要放在搜索模式的开始处；
+- 注意通配符的位置。
+
+## Chapter_7 创建计算字段
+### 7.1 计算字段
+计算字段并不实际存在与数据表中，是运行时在SELECT语句内创建的。
+> **字段（field）**
+> 基本上与列（column）的意思相同，经常互换使用，不过数据库列一般称为列，而术语字段通常与计算字段一起使用。
 
 
+### 7.2 拼接字段
+只有数据库知道SELECT语句中哪些列是实际表列，哪些是计算字段；客户端分辨不出来。
+> **拼接（concatenate）**
+> 将值联结一起构成单个值。
+
+操作符可用加号（+）或者两个竖杠（||），在MySQL中必须使用特殊的函数Concate。
+```
+SELECT Concat(vend_name,'(',vend_country,')')
+FROM Vendors
+ORDER BY vend_name;
+```
+新计算列并没有名字，可以用别名关键字AS赋予名字：
+```
+SELECT Concat(vend_name,'(',vend_country,')')
+       AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+```
+> **别名的其他用途**
+> 在实际的表列名包含不合法的字符时重新命名它，在原来的名字容易误解时扩充它。别名有时也叫做导出列，意义是一样的。
+
+### 7.3 执行算术计算
+对检索出的数据进行算术计算。
+```
+SELECT prod_id, quantity, item_price, 
+	   quantity*item_price AS expanded_price
+FROM Orderitems
+WHERE order_num = 20008;
+```
+> 如果省略了FROM子句，SELECT能简单地访问和处理表达式， SELECT 2*3; 将返回6，SELECT Now()；将返回当前日期和时间。
 
 
+## Chapter_8 使用函数处理数据
+### 8.1 函数
+不同DBMS的函数语法可能不同，SQL函数不是可移植的。
+MySQL中：
+1.提取字符串的组成部分，SUBSTRING();
+2.数据类型转换，CONVERT();
+3.取当前时间，CURDATE()和NOW()。
+> 如果使用函数，做好代码注释，以便以后能确切知道所编写的SQL代码的含义。
 
+### 8.2 使用函数
+#### 8.2.1 文本处理函数
+RTRIM()函数：去除字符串右边的空格。
+LTRIM()函数：去掉字符串左边的空格。
+LOWER()函数：将文本转换为小写。
+UPPER()函数：将文本转换为大写。
+```
+SELECT vend_name, UPPER(vend_name) AS vend_name_upcase
+FROM Vendors
+ORDER BY vend_name;
+```
+LEFT()函数：返回字符串左边的字符。
+RIGHT()函数：返回字符串右边的字符。
+LENGTH()函数：返回字符串的长度。
+SOUNDEX()函数：返回字符串的SOUNDEX值。
+#### 8.2.2 日期和时间处理函数
+日期和时间函数总是用来读取、统计和处理日期和时间，可移植性最差。
+MySQL中可以用year()函数来提取日期中的年份：
+```
+SELECT order_num
+FROM Orders
+WHERE YEAR(order_date) = 2012;
+```
+#### 8.2.3 数值处理函数
+处理数值数据，主要用于代数、三角或者几何运算。
+ABS() 绝对值
+COS() 余弦
+EXP() 指数
+PI()  圆周率
+SIN() 正弦
+SQRT()平方根
+TAN() 正切
+
+## Chapter_9 汇总数据
+### 9.1 聚集函数
+汇总数据而不用把它们实际检索出来。
+- 确定表中行数；
+- 获得表中某些行的和；
+- 找出表列的最大值、最小值、平均值。
+
+> **聚集函数（aggregate function）**
+> 对某些行运行的函数，计算并返回一个值。
+
+AVG() 返回某列的平均值
+COUNT() 返回某列的行数
+MAX()返回某列的最大值
+MIN()返回某列的最小值
+SUM()返回某列值之和
+```
+SELECT AVG(prod_price) AS avg_price
+FROM Products
+WHERE vend_id = 'DLL01';
+```
+> AVG()只能用来确定特定数值列的平均值，而且列名必须作为函数参数给出。为了获取多个列的平均值，必须使用多个AVG()函数。AVG()忽略列值为NULL的行。
+
+COUNT()确定表中行的数目或符合特定条件的行的数目。
+```
+SELECT COUNT(*) AS num_cust
+FROM Customers;
+```
+对所有行计数。
+```
+SELECT COUNT(cust_email) AS num_cust
+FROM Customers;
+```
+对有email的行计数。
+> 如果指定列名，则COUNT()会忽略指定列的值为NULL的行，如果是COUNT(*)则不忽略。
+
+MAX()返回指定列中的最大值，要指定列名。
+MAX()忽略列值为NULL的行。
+用于文本数据时，MAX()返回按该列排序后的最后一行。
+```
+SELECT MAX(prod_price) AS max_price
+FROM Products;
+```
+MIN()返回指定列中的最小值，要指定列名。
+MIN()忽略列值为NULL的行。
+用于文本数据时，MIN()返回按该列排序后的最前面一行。
+```
+SELECT MIN(prod_price) AS min_price
+FROM Products;
+```
+得到所有物品价格之和。
+```
+SELECT SUM(quantity*item_price) AS total_price
+FROM OrderItems
+WHERE order_num = 20005;
+```
+
+### 9.2 聚集不同值  
+- 对所有行执行计算，指定ALL参数或者不指定参数；
+- 只包含不同的值，指定DISTINCT参数。
+```
+SELECT AVG(DISTINCT prod_price) AS avg_price
+FROM Products
+WHERE vend_id = 'DLL01';
+```
+  
+### 9.3 组合聚集函数  
+SELECT语句可以根据需要包含多个聚集函数，用逗号隔开。
+```
+SELECT COUNT(*) AS num_items,
+	   MIN(prod_price) AS price_min,
+	   MAX(prod_price) AS price_max,
+	   AVG(prod_price) AS price_avg
+FROM Products;
+```
+> **取别名**
+> 在指定别名包含某个聚集函数的结果时，不应该使用表中实际的列名。
+
+## Chapter_10 分组数据
+### 10.1 数据分组
 
 
 
