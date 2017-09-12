@@ -54,7 +54,7 @@ SQL语句由关键字构成，最常用的是SELECT语句。
 
 使用SELECT检索表数据，至少需要给出两条信息：1.想选择什么，2.从什么地方选择。  
 ### 2.2 检索单个列
-使用SELECT
+使用SELECT：
 ```
 SELECT prod_name 
 FROM Products;
@@ -64,13 +64,13 @@ FROM Products;
 >所有的空格都被忽略，可以写在一行也可以分行。  
 
 ### 2.3 检索多个列  
-在select关键字后面给出多个列名，列名之间用逗号分隔。  
+在select关键字后面给出多个列名，列名之间用逗号分隔：
 ```
 SELECT prod_id, prod_name, prod_price
 FROM Products;
 ```  
 ### 2.4 检索所有列  
-在实际列名的位置用星号代替。  
+在实际列名的位置用星号代替：  
 ``` 
 SELECT *  
 FROM Products;
@@ -79,7 +79,7 @@ FROM Products;
 > 使用星号通配符可以检索出名字未知的列。  
 
 ### 2.5 检索不同的值  
-使用关键字DISTINCT，注：DISTINCT必须放在列名的前面。  
+使用关键字DISTINCT（DISTINCT必须放在列名的前面）：  
 ```
 SELECT DISTINCT vend_id
 FROM Products;
@@ -132,7 +132,7 @@ FROM Products
 ORDER BY prod_price, prod_name;
 ```
 ### 3.3 按列位置排序  
-ORDER BY支持按相对列位置进行排序。
+ORDER BY支持按相对列位置进行排序：
 ```
 SELECT prod_id, prod_price, prod_name
 FROM Products
@@ -140,13 +140,13 @@ ORDER BY 2, 3;
 ```  
 得到的结果与上一个命令一样，好处在于不用重新输入列名，缺点有：1.不明确给出列名可能造成错误；2.对SELECT清单进行更改会影响数据排序；3.如果进行排序的列不在SELECT清单中，不能使用这项技术。  
 ### 3.4 指定排序方向  
-降序排序使用关键字DESC。
+降序排序使用关键字DESC：
 ```
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price DESC;
 ```  
-DESC关键字只应用到直接位于其前面的列名。
+DESC关键字只应用到直接位于其前面的列名：
 ```
 SELECT prod_id, prod_price, prod_name
 FROM Products
@@ -167,12 +167,13 @@ WHERE prod_price = 3.49;
 大于 小于 等于 不等于 不大于 不小于 大于等于 小于等于 两者之间（BETWEEN） 为NULL值（IS NULL）  
 > 单引号用来限定字符串，数值不需要用引号。  
 
-使用BETWEEN必须指定两个值，低值和高值，并且用AND关键字分隔。BETWEEN匹配范围内所有值，包括边界值。
+使用BETWEEN必须指定两个值，低值和高值，并且用AND关键字分隔：
 ```
 SELECT prod_name, prod_price
 FROM Products
 WHERE prod_price BETWEEN 5 AND 10;
 ```  
+BETWEEN匹配范围内所有值，包括边界值。
 在一个列不包含值时，称其包含空值NULL。
 > **NULL**  
 > 无值（no value），与字段包含0、空字符串或者空格不同。
@@ -189,26 +190,27 @@ SQL允许给出多个WHERE子句，以AND子句或者OR子句的方式使用。
 > **操作符（operator）**  
 > 用来联结或改变WHERE子句中的子句的关键字，也称为逻辑操作符（logical operator）。
 
-通过AND操作符给WHERE子句附加条件实现对不止一个列进行过滤。
+通过AND操作符给WHERE子句附加条件实现对不止一个列进行过滤：
 ```
 SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' AND prod_price <= 4;
 ```
-通过OR操作符给WHERE子句附加条件实现匹配任一条件的行。
+通过OR操作符给WHERE子句附加条件实现匹配任一条件的行：
 ```
 SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
 ```  
-AND操作符优先级大于OR操作符，可以用圆括号对操作符进行明确分组。
+AND操作符优先级大于OR操作符，可以用圆括号对操作符进行明确分组：
 ```
 SELECT prod_name, prod_price
 FROM Products
-WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01') AND prod_price > 10;
+WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01') 
+AND prod_price > 10;
 ```
 ### 5.2 IN操作符  
-IN操作符用来指定条件范围，范围中的每个条件都可以进行匹配。
+IN操作符用来指定条件范围，范围中的每个条件都可以进行匹配：
 ```
 SELECT prod_name, prod_price
 FROM Products
@@ -224,16 +226,18 @@ ORDER BY prod_name;
 - 可以包含其他SELECT语句，能够动态地建立WHERE子句。
 
 ### 5.3 NOT操作符  
-有且只有一个功能：否定其后所跟的任何条件。NOT从不单独使用，用在要过滤的列前，而不是在其后。
-> **NOT**  
-> WHERE子句中用来否定其后条件的关键字。
-
+有且只有一个功能：否定其后所跟的任何条件：
 ```
 SELECT prod_name
 FROM Products
 WHERE NOT vend_id = 'DLL01'
 ORDER BY prod_name;
 ```  
+NOT从不单独使用，用在要过滤的列前，而不是在其后。
+> **NOT**  
+> WHERE子句中用来否定其后条件的关键字。
+
+
 与IN操作符联合使用，NOT可以非常简单找出与条件列表不匹配的行。  
 ## Chapter_6 用通配符进行过滤  
 ### 6.1 LIKE操作符  
@@ -244,7 +248,7 @@ ORDER BY prod_name;
 > 由字面值、通配符或者两者组合构成的搜索条件。
 
 使用LIKE操作符指示DBMS后面的搜索模式利用通配符而不是简单的相等匹配进行比较。
-%通配符：表示任何字符出现任意次数。
+%通配符：表示任何字符出现任意次数：
 ```
 SELECT prod_id, prod_name
 FROM Products
@@ -274,7 +278,7 @@ _通配符：只匹配单个字符，而不是多个字符。
 > **拼接（concatenate）**
 > 将值联结一起构成单个值。
 
-操作符可用加号（+）或者两个竖杠（||），在MySQL中必须使用特殊的函数Concate。
+操作符可用加号（+）或者两个竖杠（||），在MySQL中必须使用特殊的函数Concate：
 ```
 SELECT Concat(vend_name,'(',vend_country,')')
 FROM Vendors
@@ -291,7 +295,7 @@ ORDER BY vend_name;
 > 在实际的表列名包含不合法的字符时重新命名它，在原来的名字容易误解时扩充它。别名有时也叫做导出列，意义是一样的。
 
 ### 7.3 执行算术计算
-对检索出的数据进行算术计算。
+对检索出的数据进行算术计算：
 ```
 SELECT prod_id, quantity, item_price, 
 	   quantity*item_price AS expanded_price
@@ -315,7 +319,7 @@ MySQL中：
 RTRIM()函数：去除字符串右边的空格。
 LTRIM()函数：去掉字符串左边的空格。
 LOWER()函数：将文本转换为小写。
-UPPER()函数：将文本转换为大写。
+UPPER()函数：将文本转换为大写：
 ```
 SELECT vend_name, UPPER(vend_name) AS vend_name_upcase
 FROM Vendors
@@ -353,46 +357,51 @@ TAN() 正切
 > **聚集函数（aggregate function）**
 > 对某些行运行的函数，计算并返回一个值。
 
-AVG() 返回某列的平均值
-COUNT() 返回某列的行数
-MAX()返回某列的最大值
-MIN()返回某列的最小值
-SUM()返回某列值之和
+AVG() 返回某列的平均值：
 ```
 SELECT AVG(prod_price) AS avg_price
 FROM Products
 WHERE vend_id = 'DLL01';
 ```
+COUNT() 返回某列的行数；
+MAX()返回某列的最大值；
+MIN()返回某列的最小值；
+SUM()返回某列值之和。
+
 > AVG()只能用来确定特定数值列的平均值，而且列名必须作为函数参数给出。为了获取多个列的平均值，必须使用多个AVG()函数。AVG()忽略列值为NULL的行。
 
 COUNT()确定表中行的数目或符合特定条件的行的数目。
+对所有行计数：
 ```
 SELECT COUNT(*) AS num_cust
 FROM Customers;
 ```
-对所有行计数。
+对有email的行计数：
 ```
 SELECT COUNT(cust_email) AS num_cust
 FROM Customers;
 ```
-对有email的行计数。
+
 > 如果指定列名，则COUNT()会忽略指定列的值为NULL的行，如果是COUNT(*)则不忽略。
 
-MAX()返回指定列中的最大值，要指定列名。
-MAX()忽略列值为NULL的行。
-用于文本数据时，MAX()返回按该列排序后的最后一行。
+MAX()返回指定列中的最大值，要指定列名：
 ```
 SELECT MAX(prod_price) AS max_price
 FROM Products;
 ```
-MIN()返回指定列中的最小值，要指定列名。
-MIN()忽略列值为NULL的行。
-用于文本数据时，MIN()返回按该列排序后的最前面一行。
+MAX()忽略列值为NULL的行。
+用于文本数据时，MAX()返回按该列排序后的最后一行。
+
+MIN()返回指定列中的最小值，要指定列名：
 ```
 SELECT MIN(prod_price) AS min_price
 FROM Products;
 ```
-得到所有物品价格之和。
+MIN()忽略列值为NULL的行。
+用于文本数据时，MIN()返回按该列排序后的最前面一行。
+
+SUM()返回求和。
+得到所有物品价格之和：
 ```
 SELECT SUM(quantity*item_price) AS total_price
 FROM OrderItems
@@ -401,7 +410,8 @@ WHERE order_num = 20005;
 
 ### 9.2 聚集不同值  
 - 对所有行执行计算，指定ALL参数或者不指定参数；
-- 只包含不同的值，指定DISTINCT参数。
+- 只包含不同的值，指定DISTINCT参数：
+
 ```
 SELECT AVG(DISTINCT prod_price) AS avg_price
 FROM Products
@@ -409,7 +419,7 @@ WHERE vend_id = 'DLL01';
 ```
   
 ### 9.3 组合聚集函数  
-SELECT语句可以根据需要包含多个聚集函数，用逗号隔开。
+SELECT语句可以根据需要包含多个聚集函数，用逗号隔开：
 ```
 SELECT COUNT(*) AS num_items,
 	   MIN(prod_price) AS price_min,
@@ -422,7 +432,75 @@ FROM Products;
 
 ## Chapter_10 分组数据
 ### 10.1 数据分组
+使用分组可以将数据分为多个逻辑组，对每个组进行聚集计算。
+### 10.2 创建分组
+使用SELECT语句的GROUP BY子句建立：
+```
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+GROUP BY vend_id;
+```
+使用了GROUP BY就不用指定要计算和估值的每个组了，系统会自动完成。
+GROUP BY的一些重要规定：
+- GROUP BY子句可以包含任意数目的列，因而可以对分组进行嵌套，更细致地进行数据分组；
+- 如果在GROUP BY子句嵌套了分组，数据将在最后指定的分组上进行汇总；
+- GROUP BY子句中列出的每一列都必须是检索列或有效的表达式；
+- 大多数SQL实现不允许GROUP BY列带有长度可变的数据类型；
+- 除了聚集计算语句外，SELECT语句中的每一列都必须在GROUP BY子句中给出；
+- 如果分组列中包含具有NULL值的行，则NULL将作为一个分组返回，如果列中有多行NULL值，它们将分为一组；
+- GROUP BY子句必须出现在WHERE子句之后，ORDER BY子句之前。
 
+### 10.3 过滤分组
+过滤分组规定包括哪些分组，排除哪些分组。
+HAVING子句过滤分组，WHERE子句过滤行：
+```
+SELECT cust_id, COUNT(*) AS orders
+FROM Orders
+GROUP BY cust_id
+HAVING COUNT(*) >=2;
+```
+这里WHERE子句不起作用，因为过滤是基于分组聚集值，而不是特定行的值。
+> **HAVING和WHERE的差别**
+> WHERE在分组前进行过滤，HAVING在分组后进行过滤。WHERE排除的行不在分组中。
+
+```
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+WHERE prod_price >=4
+GROUP BY vend_id
+HAVING COUNT(*) >=2;
+```
+### 10.4 分组和排序
+> **GROUP BY和ORDER BY的区别**
+> GROUP BY：
+> 1.对行分组，但是输出可能不是分组的顺序； 
+> 2.只可能使用选择列或表达式列，而且必须使用每个选择列表达式；
+> 3.如果与聚集函数一起使用列，则必须使用。
+> ORDER BY： 
+> 1.对产生的输出排序；
+> 2.任意列都可以使用；
+> 3.不一定需要。
+
+检索包含三个或更多物品的订单号和订单物品的数目，按照订购物品的数目排序输出：
+```
+SELECT order_num, COUNT(*) AS items
+FROM OrderItems
+GROUP BY order_num
+HAVING COUNT(*) >=3
+ORDER BY items, order_num;
+```
+### 10.5 SELECT子句顺序
+SELECT：要返回的列或者表达式
+FROM：从中检索数据的表
+WHERE：行级过滤
+GROUP BY：分组说明
+HAVING：组级过滤
+ORDER BY：输出排序顺序
+
+## Chapter_11 使用子查询
+### 11.1 子查询
+>**查询（query）**
+>任何SQL语句都是查询，但此术语一般指SELECT语句。
 
 
 
