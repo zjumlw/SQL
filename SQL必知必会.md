@@ -609,7 +609,7 @@ WHERE Products.vend_id = Vendors.vend_id
 这里WHERE子句定义了两个联结条件对于三个表，第三个联结条件用来过滤订单20007中的物品。
 > 不要联结不必要的表，联结的表越多，性能下降越厉害。
 
-对于Chapter_11中的子查询，使用联结可以实现相同的功能：
+对于Chapter 11中的子查询，使用联结可以实现相同的功能：
 ```
 SELECT cust_name, cust_contact
 FROM Customers, Orders, OrderItems
