@@ -237,6 +237,21 @@ ORDER BY prod_name;
 与IN操作符联合使用，NOT可以非常简单找出与条件列表不匹配的行。  
 ## Chapter_6 用通配符进行过滤  
 ### 6.1 LIKE操作符  
+构造通配符搜索模式。
+> **通配符（wildcard）**  
+> 用来匹配值的一部分的特殊字符。
+> **搜索模式（search pattern）**  
+> 由字面值、通配符或者两者组合构成的搜索条件。
+
+使用LIKE操作符指示DBMS后面的搜索模式利用通配符而不是简单的相等匹配进行比较。
+%通配符：表示任何字符出现任意次数。
+```
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE 'FISH%';
+```
+以上表示所有以fish开头的产品。
+
 
 
 
