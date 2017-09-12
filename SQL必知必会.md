@@ -490,17 +490,22 @@ HAVING COUNT(*) >=3
 ORDER BY items, order_num;
 ```
 ### 10.5 SELECT子句顺序
-SELECT：要返回的列或者表达式
-FROM：从中检索数据的表
-WHERE：行级过滤
-GROUP BY：分组说明
-HAVING：组级过滤
+SELECT：要返回的列或者表达式  
+FROM：从中检索数据的表  
+WHERE：行级过滤  
+GROUP BY：分组说明  
+HAVING：组级过滤  
 ORDER BY：输出排序顺序
 
 ## Chapter_11 使用子查询
 ### 11.1 子查询
 >**查询（query）**
 >任何SQL语句都是查询，但此术语一般指SELECT语句。
+
+SQL允许建立子查询，就是嵌套在其他查询中的查询。
+### 11.2 利用子查询进行过滤
+问题：检索出订购物品RGAN01的所有顾客
+1.检索包含物品RGAN01的所有订单的编号；
 
 
 
