@@ -471,7 +471,7 @@ GROUP BY vend_id
 HAVING COUNT(*) >=2;
 ```
 ### 10.4 分组和排序
-> **GROUP BY和ORDER BY的区别**
+> **GROUP BY和ORDER BY的区别**  
 > GROUP BY：
 > 1.对行分组，但是输出可能不是分组的顺序； 
 > 2.只可能使用选择列或表达式列，而且必须使用每个选择列表达式；
@@ -504,8 +504,82 @@ ORDER BY：输出排序顺序
 
 SQL允许建立子查询，就是嵌套在其他查询中的查询。
 ### 11.2 利用子查询进行过滤
-问题：检索出订购物品RGAN01的所有顾客
-1.检索包含物品RGAN01的所有订单的编号；
+问题：检索出订购物品RGAN01的所有顾客  
+1.检索包含物品RGAN01的所有订单的编号：
+```
+SELECT order_num
+FROM OrderItems
+WHERE prod_id = 'RGAN01';
+```
+
+得到订单编号是：20007， 20008；
+2.检索具有前一步列出的订单编号的所有顾客的ID：
+```
+SELECT cust_id
+FROM Orders
+WHERE order_num in(20007, 20008);
+```
+
+结合1和2步骤：
+```
+SELECT cust_id
+FROM Orders
+WHERE order_num in(SELECT order_num
+				   FROM OrderItems
+				   WHERE prod_id = 'RGAN01');
+```
+
+在SELECT语句中，子查询总是从内向外处理。
+3.检索前一步返回的所有顾客ID的顾客信息：
+```
+SELECT cust_name, cust_contact
+FROM Customers
+WHERE cust_id IN(SELECT cust_id
+FROM Orders
+WHERE order_num in(SELECT order_num
+				   FROM OrderItems
+				   WHERE prod_id = 'RGAN01'));
+```
+
+在WHERE子句中使用子查询能够编写出功能很强且很灵活的SQL语句。对于嵌套的子查询的数目没有限制，不过在实际使用时由于性能的限制，不能嵌套太多的子查询。
+> 作为子查询的SELECT语句只能查询单列。
+
+### 11.3 作为计算字段使用子查询
+问题：显示Customers表中每个顾客的订单总数
+1. 从Customers表中检索顾客列表；
+2. 对于检索出的每个顾客，统计其在Orders表中的订单数目。
+
+```
+SELECT cust_name, cust_state,
+		(SELECT COUNT(*)
+		FROM Orders
+		WHERE Orders.cust_id = Customers.cust_id) AS orders
+FROM Customers
+ORDER BY cust_name;
+```
+
+对Customers表中每个顾客返回三列：cust_name、 cust_state和orders。 orders是计算字段，由圆括号中的子查询建立，该子查询对检索出的每个顾客执行一次。  
+其中的WHERE子句，比较Orders表中的cust_id和当前从Customers表中检索的cust_id，如果是相同，则求在Orders表中该cust_id的行数，即订单总数。  
+
+> 在SELECT语句中操作多个表，就应该使用完全限定列名来避免歧义：
+> Orders.cust_id和Customers.cust_id。
+
+## Chapter_12 联结表
+### 12.1 联结
+SQL最强大的功能之一就是能在数据查询的执行中联结（join）表。  
+相同的数据出现多次不是好事，关系表的设计就是要把信息分解成多个表，一个数据一个表。各表通过某些共同的值互相关联。  
+关系数据可以有效地存储，方便地处理。因此关系数据库的可伸缩性比非关系数据库要好。  
+> **可伸缩（scale）**
+> 能够适应不断增加的工作量而不失败。
+
+SELECT语句通过联结检索出存储在多个表中的数据。
+### 12.2 创建联结
+指定要联结的所有表以及关联它们的方式即可：
+```
+SELECT vend_name, prod_name, prod_price
+FROM Vendors, Products
+WHERE Vendors.vend_id = Products.vend_id;
+```
 
 
 
