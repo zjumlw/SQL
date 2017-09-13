@@ -316,19 +316,23 @@ MySQL中：
 
 ### 8.2 使用函数
 #### 8.2.1 文本处理函数
-RTRIM()函数：去除字符串右边的空格。
-LTRIM()函数：去掉字符串左边的空格。
-LOWER()函数：将文本转换为小写。
-UPPER()函数：将文本转换为大写：
+RTRIM()函数：去除字符串右边的空格。  
+LTRIM()函数：去掉字符串左边的空格。  
+LOWER()函数：将文本转换为小写。  
+UPPER()函数：将文本转换为大写：  
 ```
 SELECT vend_name, UPPER(vend_name) AS vend_name_upcase
 FROM Vendors
 ORDER BY vend_name;
 ```
-LEFT()函数：返回字符串左边的字符。
-RIGHT()函数：返回字符串右边的字符。
-LENGTH()函数：返回字符串的长度。
+
+LEFT()函数：返回字符串左边的字符。  
+RIGHT()函数：返回字符串右边的字符。  
+LENGTH()函数：返回字符串的长度。  
+LOCATE()函数：找出串的一个子串。  
+SUBSTRING()函数：返回子串的字符。
 SOUNDEX()函数：返回字符串的SOUNDEX值。
+
 #### 8.2.2 日期和时间处理函数
 日期和时间函数总是用来读取、统计和处理日期和时间，可移植性最差。
 MySQL中可以用year()函数来提取日期中的年份：

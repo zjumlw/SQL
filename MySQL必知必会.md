@@ -38,7 +38,7 @@ ORDER BY prod_name;
 ```
 
 []是另一种OR语句。
-#### 匹配范围
+#### 9.2.4 匹配范围
 用-来定义一个范围：
 ```
 SELECT prod_name
@@ -47,7 +47,7 @@ WHERE prod_name REGEXP '[1-5] Ton'
 ORDER BY prod_name;
 ```
 
-#### 匹配特殊字符
+#### 9.2.5 匹配特殊字符
 为了匹配特殊字符，必须使用\\作为前导：
 ```
 SELECT vend_name
@@ -57,4 +57,45 @@ ORDER BY vend_name;
 ```
 
 > 这种处理叫做转义，其他转义还有\\\f换页，\\\n换行，\\\r回车，\\\t制表，\\v纵向制表。
+
+#### 9.2.6 匹配字符类
+预定义的字符集称为字符类。
+#### 9.2.7 匹配多个实例
+利用正则表达式重复元字符：
+```
+SELECT prod_name
+FROM products
+WHERE prod_name REGEXP '\\([0-9] sticks?\\)'
+ORDER BY prod_name;
+```
+
+说明：\\(匹配\\)，[0-9]匹配任意数字，sticks?匹配stick和sticks。  
+*：0个或多个匹配  
++：1个或多个匹配  
+?：0个或1个匹配  
+{n}：指定数目的匹配  
+{n,}：不少于指定数目的匹配  
+{n，m}：匹配数目的范围  
+匹配连在一起的4位数字：
+```
+SELECT prod_name
+FROM products
+WHERE prod_name REGEXP '[[:digit:]]{4}'#{4}要求前面的字符出现4次
+#WHERE prod_name REGEXP '[0-9][0-9][0-9][0-9]'
+ORDER BY prod_name;
+```
+
+#### 9.2.8 定位符
+^：文本的开始  
+$：文本的结尾  
+[[:<:]]：词的开始  
+[[:>:]]：词的结尾  
+检索以数（包括小数点开始的数）开始的所有产品：
+```
+SELECT prod_name
+FROM products
+WHERE prod_name REGEXP '^[0-9\\.]'
+ORDER BY prod_name;
+```
+
 
