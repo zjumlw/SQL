@@ -454,6 +454,14 @@ GROUP BY的一些重要规定：
 - 如果分组列中包含具有NULL值的行，则NULL将作为一个分组返回，如果列中有多行NULL值，它们将分为一组；
 - GROUP BY子句必须出现在WHERE子句之后，ORDER BY子句之前。
 
+可以使用WITH ROLLUP关键字得到汇总信息：
+```
+SELECT vend_id, COUNT(*) AS num_prods
+FROM Products
+GROUP BY vend_id WITH ROLLUP;
+```
+
+
 ### 10.3 过滤分组
 过滤分组规定包括哪些分组，排除哪些分组。
 HAVING子句过滤分组，WHERE子句过滤行：
@@ -500,7 +508,8 @@ FROM：从中检索数据的表
 WHERE：行级过滤  
 GROUP BY：分组说明  
 HAVING：组级过滤  
-ORDER BY：输出排序顺序
+ORDER BY：输出排序顺序  
+LIMIT：要检索的行数
 
 ## Chapter 11 使用子查询
 ### 11.1 子查询
@@ -624,6 +633,176 @@ WHERE Customers.cust_id = Orders.cust_id
 
 ## Chapter 13 创建高级联结
 ### 13.1 使用表别名
+SQL除了可以给列名和计算字段使用别名，还允许给表名起别名，可以：缩短SQL语句；允许在一条SELECT语句中多次使用相同的表。  
+```
+SELECT cust_name,cust_contact
+FROM Customers AS C, Orders AS O, OrderItems AS OI
+WHERE C.cust_id = O.cust_id
+	AND OI.order_num = O.order_num
+	AND prod_id = 'RGAN01';
+```
+
+这里表别名只用于WHERE子句，也可以用于SELECT的列表、ORDER BY子句以及其他语句部分。
+### 13.2 使用不同类型的联结
+#### 13.2.1 自联结
+在一条SELECT语句中不止一次引用相同的表：
+```
+SELECT cust_id, cust_name, cust_contact
+FROM Customers
+WHERE cust_name = (SELECT cust_name
+					FROM Customers
+					WHERE cust_contact = 'Jim Jones');
+```
+
+这是利用子查询的做法，还有：
+```
+SELECT c1.cust_id, c1.cust_name, c1.cust_contact
+FROM Customers AS c1, Customers AS c2
+WHERE c1.cust_name = c2.cust_name
+	AND c2.cust_contact = 'Jim Jones';
+```
+
+SELECT语句使用c1前缀明确给出所需列的全名，如果不这样，DBMS将返回错误，因为cust_id, cust_name, cust_contact的列各有两个。WHERE首先联结两个表，然后按照第二个表的cust_contact过滤数据，返回所需的数据。
+> **用自联结而不用子查询**
+> DBMS处理联结比处理子查询快很多，选择性能更好的。
+
+#### 13.2.2 自然联结
+标准的联结返回所有数据，相同的列甚至多次出现。自然联结排除多次出现，使每一列只返回一次。  
+自然联结要求只能选择哪些唯一的列，一般通过对一个表使用通配符（SELECT *），而对其他表的列使用明确的子集来完成：
+```
+SELECT C.*, O.order_num, O.order_date,
+	OI.prod_id, OI.quantity, OI.item.price
+FROM Customers AS C, Orders AS O, OrderItems AS OI
+WHERE C.cust_id = O.cust_id
+	AND OI.order_num = O.order_num
+	AND prod_id = 'RGAN01';
+```
+
+#### 13.2.3 外联结
+许多联结将一个表中的行与另一个表中的行相关联，但有时候需要包含没有关联行的那些行，称为外联结。  
+内联结：
+```
+SELECT Customers.cust_id, Orders.order_num
+FROM Customers INNER JOIN Orders
+ON Customers.cust_id = Orders.cust_id;
+```
+
+外联结：
+```
+SELECT Customers.cust_id, Orders.order_num
+FROM Customers LEFT OUTER JOIN Orders
+ON Customers.cust_id = Orders.cust_id;
+```
+
+外联结可以检索包括没有订单顾客在内的所有顾客。LEFT关键字指定包括其所有行的表。
+
+全联结（MySQL不支持）：
+```
+SELECT Customers.cust_id, Orders.order_num
+FROM Customers FULL OUTER JOIN Orders
+ON Customers.cust_id = Orders.cust_id;
+```
+
+### 13.3 使用带聚集函数的联结
+聚集函数可以和联结一起使用。  
+检索所有顾客及每个顾客所下的订单数：
+```
+SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
+FROM Customers INNER JOIN Orders
+ON Customers.cust_id = Orders.cust_id
+GROUP By Customers.cust_id;
+```
+
+还有
+```
+SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
+FROM Customers LEFT OUTER JOIN Orders
+ON Customers.cust_id = Orders.cust_id
+GROUP By Customers.cust_id;
+```
+
+### 13.4 使用联结和联结条件
+要点：
+- 注意所使用的联结类型。
+- 确切的语法查看文档。
+- 保证正确的联结条件。
+- 应该总是提供联结条件，否则会得出笛卡尔积。
+- 在一个联结中可以包含多个表，甚至可以对每个联结采用不同的联结类型。
+
+
+## Chapter 14 组合查询
+### 14.1 组合查询
+SQL允许执行多个查询，并将结果作为一个查询结果集返回，称为并（union）或符合查询（compound query）。  
+有两种情况需要使用组合查询：
+1.在一个查询中从不同的表返回数据结构；
+2.对一个表执行多个查询，按一个查询返回结果。
+
+> 任何具有多个WHERE子句的SELECT语句都可以作为一个组合查询。
+
+### 14.2 创建组合查询
+#### 14.2.1 使用UNION
+给出每条SELECT语句，在各条语句之间放上关键字UNION。
+单条语句：
+```
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN('IL', 'IN', 'MI');
+```
+
+```
+SELECT cust_name, cust_contact, cust_email, cust_state
+FROM Customers
+WHERE cust_name = 'Fun4All';
+```
+
+结合两条语句：
+```
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN('IL', 'IN', 'MI')
+UNION
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All';
+```
+
+DBMS执行这两条SELECT语句，并把输出组合成一个查询结果集。  
+如果使用WHERE子句而不是UNION：
+```
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN('IL', 'IN', 'MI')
+OR cust_name = 'Fun4All';
+```
+
+#### 14.2.2 UNION规则
+规则：
+- UNION必须由两条或两条以上的SELECT语句组成，语句之间用关键字UNION分隔。
+- UNION中的每个查询必须包含相同的列、表达式或聚集函数（出现次序可以不同）。
+- 列数据类型必须兼容：类型不必完全相同，但必须是DBMS可以隐含转换的类型。
+
+#### 14.2.3 包含或取消重复的行
+使用UNION时，重复的行被自动取消。  
+可以用UNiON ALL返回所有的匹配行。
+> 如果需要每个条件的匹配行全部出现（包括重复行），必须使用UNION ALL而不是WHERE。
+
+#### 14.2.4 对组合查询结果排序
+ORDER BY必须位于最后一条SELECT语句之后。
+```
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_state IN('IL', 'IN', 'MI')
+UNION
+SELECT cust_name, cust_contact, cust_email
+FROM Customers
+WHERE cust_name = 'Fun4All'
+ORDER BY cust_name, cust_contact;
+```
+
+> UNION可以组合多个表的数据，即使有不匹配列名的表，可以将UNION与别名组合，检索一个结果集。
+
+## Chapter 15 插入数据
+### 15.1 数据插入
 
 
 
