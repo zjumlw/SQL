@@ -38,7 +38,7 @@
 - 主键列中的值不允许修改或更新；
 - 主键值不能重用（如果某行被删除，它的主键不能赋给以后的新行）。
 
-### 1.2什么是SQL  
+### 1.2 什么是SQL  
 SQL（Structured Query Language），专门用来与数据库沟通的语言。设计SQL的目的是很好地完成一项任务--提供一种从数据库中读写数据的简单有效的方法。  
 SQL的优点：  
 
@@ -102,14 +102,15 @@ LIMIT 5 OFFSET 5;
 
 
 ### 2.7 使用注释  
-行内注释：
+行内注释：  
+
 ```
-/*来一条注释
-*/
+/*来一条注释*/
 SELECT prod_name
 FROM Products;
 #这是一条注释
 ```  
+
 ## Chapter 3 排序检索数据  
 ### 3.1 排序数据  
 如果不明确规定排序顺序，则不应该假定检索出的数据的顺序有任何意义。
@@ -803,6 +804,129 @@ ORDER BY cust_name, cust_contact;
 
 ## Chapter 15 插入数据
 ### 15.1 数据插入
+插入有几种方式：
+- 插入完整的行；
+- 插入行的一部分；
+- 插入某些查询的结果。
+
+#### 15.1.1 插入完整的行
+INSERT语法，要求指定表名和插入到新行中的值：
+```
+INSERT INTO Customers
+VALUES('1000000006',
+'Toy Land', 
+'123 Any Street',
+'New York',
+'NY',
+'11111',
+'USA',
+NULL,
+NULL)
+```
+
+如果某列没有值，则应该用NULL值。各列必须以它们在表定义中出现的次序填充。
+这种依赖特定次序的SQL语句很不安全。  
+可以在INSERT语句中明确给出列名，优点是：即使表的结构改变，INSERT语句仍然能正确工作。
+> **总是使用列的列表**
+> 不要使用没有明确给出列的INSERT语句。
+> 不管使用哪种INSERT，VALUES的数目必须正确。
+
+#### 15.1.2 插入部分行
+给出表的列名，可以只给某些列提供值，给其他列不提供值。
+```
+INSERT INTO Customers(cust_id,
+					cust_name)
+VALUES('100005',
+		'Toy Land');
+```
+
+INSERT可以省略某些列：
+- 该列定义允许为NULL；
+- 在表定义中给出默认值。
+
+#### 15.1.3 插入检索出的数据
+INSERT SELECT语句，SELECT中列出的每一列对应于Customers表名后所跟的每一列。  
+INSERT SELECT中SELECT语句可以包含WHERE子句，以过滤插入的数据。
+
+> **插入多行**
+> INSERT通常只插入一行，如果要插入多行，则要执行多个INSERT语句。INSERT SELECT可以用INSERT插入多行，不管SELECT语句返回多少行，都将被INSERT插入。
+
+### 15.2 从一个表复制到另一个表
+使用SELECT INTO语句。
+MySQL中：
+```
+CREATE TABLE CustCopy AS
+SELECT * FROM Customers;
+```
+
+需要知道：
+- 任何SELECT选项和子句都可以使用；
+- 可利用联结从多个表插入数据；
+- 不管从几个表中检索数据，数据都只能插入到一个表中。
+
+## Chapter 16 更新和删除数据
+### 16.1 更新数据
+使用UPDATE语句：
+- 更新表中的特定行；
+- 更新表中的所有行。  
+
+UPDATE语句由三部分组成：
+- 要更新的表；
+- 列名和它们的新值；
+- 确定要更新哪些行的过滤条件。  
+
+UPDATE语句总是以要更新的表名开始：
+```
+UPDATE Customers
+SET cust_email = 'gg@gmail.com'
+WHERE cust_id = '1000000005';
+```
+
+如果没有WHERE子句，则会用这个email更新Customers表中所有的行。  
+更新多个列：
+```
+UPDATE Customers
+SET cust_contact = 'Sam Will',
+	cust_email = 'samnice@gmail.com'
+WHERE cust_id = '1000000006';
+```
+
+> **在UPDATE语句中使用子查询**
+> 能用SELECT语句检索出来的火速局来更新列数据。
+
+要删除某个列的值，可设置它为NULL。
+
+### 16.2 删除数据
+使用DELETE语句：
+- 从表中删除特定的行；
+- 从表中删除所有的行。
+
+> **不要省略WHERE子句**
+> 如果不小心可能会删除表中所有行。
+
+删除一行：
+```
+DELETE FROM Customers
+WHERE cust_id = '1000000006';
+```
+
+> DELETE语句从表中删除行，但是不删除表本身。
+
+### 16.3 更新和删除的指导原则
+必须带有WHERE子句，如果UPDATE语句没有WHERE子句，则表中每一行都将使用新值；如果DELETE语句没有WHERE子句，表中所有数据都将被删除。  
+重要原则：
+- 除非确定打算更新和删除每一行，否则一定要带有WHERE子句；
+- 保证每个表都有主键；
+- 在UPDATE或DELETE语句使用WHERE子句前，应该先用SELECT进行测试，保证它过滤的时正确的记录；
+- 使用强制实施引用完整性的数据库，这样DBMS将不允许删除其数据与其他表相关联的行。
+
+> MySQL没有撤销按钮，要小心操作。
+
+## Chapter 17 创建和操纵表
+### 17.1 创建表
+一般有两种创建表的方法：
+- 交互式创建和管理数据库表的工具；
+- 直接用SQL语句操纵。
 
 
 

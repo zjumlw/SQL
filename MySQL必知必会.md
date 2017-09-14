@@ -182,6 +182,14 @@ WHERE Match(note_text) Against('anvils' WITH QUERY EXPANSION);
 - 表达式分组；
 - 另外一些内容。
 
+```
+SELECT note_text
+FROM productnotes
+WHERE Match(note_text) Against('heavy -rope*' IN BOOLEAN MODE);
+```
+
+其中有相关的全文本布尔操作符。
+
 > 没有FULLTEXT也可以使用，但是速度很慢。
 
 #### 18.2.5 全文本搜索的使用说明
