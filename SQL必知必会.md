@@ -928,5 +928,85 @@ WHERE cust_id = '1000000006';
 - 交互式创建和管理数据库表的工具；
 - 直接用SQL语句操纵。
 
+#### 17.1.1 表创建基础
+利用CREATE TABLE创建表：
+- 新表的名字，在关键字CREATE TABLE后给出；
+- 表列的名字和定义，用逗号分开；
+- 有些DBMS需要指定表的位置。
+
+创建Products：
+```
+CREATE TABLE Products
+(
+	prod_id	char(10) NOT NULL,
+	vend_id char(10) NOT NULL,
+	prod_name char(254) NOT NULL,
+	prod_price decimal(8,2) NOT NULL,
+	prod_desc varchar(1000) NULL,
+	PRIMARY KEY (prod_id)
+);
+```
+
+> **替换现有的表**
+> 创建新的表时，指定的表名必须不存在。SQL要求首先手工删除某表，然后再重建它，不能简单用创建语句覆盖它。
+
+#### 17.1.2 使用NULL值
+NULL值就是没有值或缺值。允许NULL值的列允许在插入行时不给出该列的值，反之则不允许。每个表列要么时NULL列，要么是NOT NULL列，在创建时由表的定义规定：
+```
+CREATE TABLE Orders
+(
+	order_num INTEGER NOT NULL,
+	order_date DATETIME NOT NULL,
+	cust_id char(10) NOT NULL,
+	PRIMARY KEY (order_num)
+);
+```
+
+下面混合NULL和NOT NULL列的表：
+```
+CREATE TABLE Vendors
+(
+	vend_id char(10) NOT NULL,
+	vend_name char(50) NOT NULL,
+	vend_address char(50) NULL,
+	vend_city char(50) NULL,
+	vend_state char(5) NULL,
+	vend_zip char（10） NULL,
+	vend_country char(50) NULL,
+	PRIMARY KEY (vend_id)
+);
+```
+
+#### 17.1.3 指定默认值
+如果插入行时不给出值，则使用默认值，就是在CREATE TABLE语句的列定义中用了关键字DEFAULT指定的值：
+```
+CREATE TABLE OrderItems
+(
+	order_num int NOT NULL,
+	order_item int NOT NULL,
+	prod_id char(10) NOT NULL,
+	quantity int NOT NULL DEFAULT 1,
+	item_price decimal(8,2) NOT NULL,
+	PRIMARY KEY (order_num, order_item)
+)Engine = InnoDB;
+```
+
+> 默认值常用于日期或时间戳列，MySQL中是CURRENT_DATE()。
+
+#### 17.1.4 主键值
+在创建表的时候或者创建之后都可以定义表的主键。
+
+#### 17.1.5 引擎类型
+在MySQL中，创建表有引擎语句ENGINE = InnoDB结束，该引擎具体创建表。  
+MySQL中有多个引擎，它们具有各自不同的功能和特性，为不同的任务选择正确的引擎能够获得良好的功能和灵活性。  
+如果省略引擎语句，则使用默认引擎。  
+常见的几种引擎：
+- InnoDB时一个可靠的事物处理引擎，不支持全文本搜索；
+- MEMORY在功能等同于MyISAM，但由于数据存储在内存中，速度很快，适合与临时表；
+- MyISAM是一个性能极高的引擎，支持全文本搜索，但是不支持事物处理。
+
+引擎类型可以混用。但是使用一个引擎的表不能引用具有使用不同引擎的表的外键。
+
+### 17.2 更新表
 
 
