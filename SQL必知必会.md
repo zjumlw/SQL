@@ -1008,5 +1008,165 @@ MySQL中有多个引擎，它们具有各自不同的功能和特性，为不同
 引擎类型可以混用。但是使用一个引擎的表不能引用具有使用不同引擎的表的外键。
 
 ### 17.2 更新表
+使用ALTER TABLE语句：
+- 理想情况下，不要在表中包含数据时对其进行更新；应该在表的设计过程中充分考虑未来可能的需求，避免今后对表的结构做大改动；
+- 允许给现有的表增加列，不过数据类型有所限制；
+- 不允许删除或更改表中的列；
+- 允许重新命名表中的列；
+- 限制对已经填有数据的列进行更改，对为填有数据的列几乎没有限制。
 
+使用ALTER TABLE更改表结构，必须给出一下信息：
+- 在ALTER TABLE之后给出要更改的表名；
+- 列出要做哪些更改。
 
+给表添加一个列：
+```
+ALTER TABLE vendors
+ADD vend_phone char(20);
+```
+
+删除该列：
+```
+ALTER TABLE vendors
+DROP COLUMN vend_phone;
+```
+
+ALTER TABLE常见用途是定义主键、外键：
+```
+ALTER TABLE Customers ADD PRIMARY KEY (cust_id);
+ALTER TABLE OrderItems 
+ADD CONSTRAINT FK_OrderItems_Orders 
+FOREIGN KEY (order_num) REFERENCES Orders (order_num);	
+```
+
+复杂的表结构更改一般需要手动删除过程：
+- 用新的列布局创建一个新表；
+- 使用INSERT SELECT语句从旧表复制数据到新表；
+- 检验包含所需数据的新表；
+- 重命名旧表（如果确定，可以删除它）；
+- 用旧表原来的名字重命名新表；
+- 根据需要，重新创建触发器、存储过程、索引和外键。
+
+### 17.3 删除表
+使用DROP TABLE语句：
+```
+DROP TABLE CustCopy;
+```
+
+### 17.4 重命名表
+RENAME TABLE语句实现：
+```
+RENAME TABLE customers2 TO customers,
+			backup_vendors TO vendors;
+```
+
+## Chapter 18 使用视图
+### 18.1 视图
+视图是虚拟的表，与包含数据的表不一样，视图只包含使用时动态检索数据的查询。
+#### 18.1.1 为什么使用视图
+常见应用：
+- 重用SQL语句；
+- 简化复杂的SQL操作；
+- 使用表的一部分而不是整个表；
+- 保护数据，授予用户访问表的特定部分的权限，而不是整个表的访问权限；
+- 更改数据格式和表示，视图可返回与底层表的表示和格式不同的数据。
+
+#### 18.1.1 视图的规则和限制
+规则和限制：
+- 与表一样，视图必须唯一命名；
+- 对于可以创建的视图数目没有限制；
+- 为了创建视图，必须具有足够的访问权限，限制由数据库管理人员授予；
+- ORDER BY可以用在视图中，如果从该视图检索数据的SELECT语句中也含有ORDER BY，那么视图中的ORDER BY将被覆盖；
+- 视图不能索引，不能有关联的触发器或默认值；
+- 视图可以和表一起使用。
+
+### 18.2 使用视图
+视图的创建：
+- 用CREATE VIEW语句来创建；
+- 用SHOW CREATE VIEW viewname来查看创建视图的语句；
+- 用DROP VIEW viewname来删除视图；
+- 先DROP再CREATE或者CREATE OR REPLACE VIEW来更新试图，如果更新的视图不存在，第二句会创建一个视图。
+
+#### 18.2.1 利用视图简化复杂的联结
+隐藏复杂的SQL：
+```
+CREATE VIEW ProductCustomers AS
+SELECT cust_name, cust_contact, prod_id
+FROM Customers, Orders, OrderItems
+WHERE Customers.cust_id = Orders.cust_id
+	AND OrderItems.order_num = Orders.order_num;
+```
+
+ProductCustomer时视图联结了三个表，返回已订购任意产品的所有顾客的列表。可以用来查询特定的信息：
+```
+SELECT * FROM ProductCustomers
+WHERE prod_id = 'RGAN01';
+```
+
+> **创建可重用的视图**
+> 创建不绑定特定数据的视图是一种好办法。扩展视图的范围不仅使得它能被重用，而且可能更有用。这样不需要创建和维护多个类似的视图。
+
+#### 18.2.2 用视图重新格式化检索出的数据
+重新格式化检索出的数据。  
+返回供应商名和位置：
+```
+SELECT Concat(RTRIM(vend_name),'(',RTRIM(vend_country),')')
+	AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+```
+
+如果经常需要这个格式的结果，可以把此语句转换为视图：
+```
+CREATE VIEW VendorLocation AS
+SELECT Concat(RTRIM(vend_name),'(',RTRIM(vend_country),')')
+	AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+```
+
+#### 18.2.3 用视图过滤不想要的数据
+定义CustomerEMailList视图过滤没有电子邮件地址的顾客：
+```
+CREATE VIEW CustomerEMailList AS
+SELECT cust_id, cust_name, cust_email
+FROM Customers
+Where cust_email IS NOT NULL;
+```
+
+#### 18.2.4 使用视图与计算字段
+简化计算字段的使用。  
+计算每种物品的总价格：
+```
+SELECT prod_id, quantity, item_price,
+	quantity*item_price AS expanded_price
+FROM OrderItems
+WHERE order_num = 20008;
+```
+
+将其转换为视图：
+```
+CREATE VIEW OrderItemsExpanded AS
+SELECT prod_id, quantity, item_price,
+	quantity*item_price AS expanded_price
+FROM OrderItems
+WHERE order_num = 20008;
+```
+
+#### 18.2.5 更新视图
+
+通常视图是可以更新的（INSERT、UPDATE、DELETE）。  
+MySQL不能正确地确定被更新的基数据，则不允许更新。  
+视图定义中有以下操作，则不能进行视图的更新：
+- 分组（使用GROUP BY和HAVING）；
+- 联结；
+- 子查询；
+- 并；
+- 聚集函数（Min， Count，Max）；
+- DISTINCT；
+- 导出列。
+
+> 应该将视图应用于检索（SELECT）而不是更新（INSERT、UPDATE、DELETE）。
+
+## Chapter 19 使用存储过程
+### 19.1 存储过程
