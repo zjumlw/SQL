@@ -1,8 +1,10 @@
-SELECT cust_name, cust_contact, cust_email
-FROM Customers
-WHERE cust_state IN('IL', 'IN', 'MI')
-UNION
-SELECT cust_name, cust_contact, cust_email
-FROM Customers
-WHERE cust_name = 'Fun4All'
-ORDER BY cust_name, cust_contact;
+#DROP PROCEDURE IF EXISTS processorders;
+
+#DROP TABLE ordertotals;
+#call processorders();
+#SELECT * from ordertotals;
+
+#drop TRIGGER updatevendor;
+
+#CREATE TRIGGER updatevendor BEFORE UPDATE ON vendors
+#FOR EACH ROW SET NEW.vend_state = Upper(NEW.vend_state);

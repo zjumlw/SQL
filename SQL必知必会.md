@@ -1170,3 +1170,195 @@ MySQL不能正确地确定被更新的基数据，则不允许更新。
 
 ## Chapter 19 使用存储过程
 ### 19.1 存储过程
+存储过程就是为以后使用而保存的一条或多条SQL语句，可以视为批文件。
+### 19.2 为什么要使用存储过程
+原因如下：
+- 通过把处理封装在一个易用的单元中，可以简化复杂的操作；
+- 由于不要求反复建立一系列处理步骤，因而保证了数据的一致性；就是为了防止错误，需要执行的步骤越多，出错的可能性就越大；
+- 简化对变动的管理；如果表名、列名或业务逻辑发生了变化，那么只需要更改存储过程的代码，使用人员甚至不需要知道这些变化；就是安全性，通过存储过程限制对基础数据的访问，减少了数据讹误的机会；
+- 存储过程通常以编译过的形式存储，提高了性能；
+- 存在一些只能用在单个请求中的SQL元素与特性，存储过程可以使用他们来编写功能更强更灵活的代码。
+
+缺陷：
+- 不同DBMS的存储过程语法不同；
+- 编写存储过程比编写基本SQL语句复杂，需要更高的技能，更丰富的经验。数据库管理员把限制存储过程的创建作为安全措施。
+
+### 19.3 执行存储过程
+使用EXECUTE接受存储过程名和需要传递给它的任何参数：
+```
+EXECUTE AddNewProduct('JTS01',
+				'Stuffed Eiffel Tower',
+				6.49,
+				'Plush stuffed toy with the text La
+				Tour Eiffel in red white and bule');
+```
+
+MySQL中执行存储过程的语句为CALL，接受存储过程的名字以及需要传递给它的任意参数。
+```
+CALL productpricing(@pricelow,
+					@pricehigh,
+					@priceaverage);
+```
+ 
+### 19.4 创建存储过程
+```
+CREATE PROCEDURE productpricing()
+BEGIN
+	SELECT Avg(prod_price) AS priceaverage
+	FROM products;
+END;
+```
+
+> 临时更改命令行使用程序的语句分隔符
+> DELIMITER //
+> 将使用//作为新的语句结束分隔符。
+
+### 19.5 删除存储过程
+存储过程在创建之后，被保存在服务器上以供使用，直至被删除。删除命令从服务器中删除存储过程：
+```
+DROP PROCEDURE productpricing;
+```
+
+> 注意这里没有()，只给出存储过程名。
+
+如果指定的过程名不存在则会报错，所以可以使用  
+DROP PROCEDURE IF EXISTS。
+
+### 19.6 使用参数
+一般存储过程并不显示结果，而是把结果返回给你指定的变量。
+> 变量
+> 内存中一个特定的变量，用来临时存储数据。
+
+```
+CREATE PROCEDURE productpricing(
+			OUT pl DECIMAL(8,2),
+			OUT ph DECIMAL(8,2),
+			OUT pa DECIMAL(8,2)
+)
+BEGIN
+	SELECT Min(prod_price)
+	INTO pl
+	FROM products;
+	SELECT Max(prod_price)
+	INTO ph
+	FROM products;
+	SELECT avg(prod_price)
+	INTO pa
+	FROM products;
+END;
+```
+
+存储过程接受3个参数：pl存储产品最低价格，ph存储最高价格，pa存储平均价格。每个参数必须具有指定的类型，这里使用十进制值。  
+关键字OUT指出相应的参数用来存储过程中传出的一个值。IN传递给存储过程，INOUT对存储过程传入和传出。  
+为调用此修改过的存储过程，必须指定3个变量名：
+```
+CALL productpricing(@pricelow,
+					@pricehigh,
+					@priceaverage);
+```
+
+CALL语句给出的三个参数是存储过程将保存结果的3个变量的名字。该语句不显示任何数据。检索平均价格：
+```
+SELECT @priceaverage;
+```
+
+检索3个值：
+```
+SELECT @pricehigh, @pricelow, @priceaverage;
+```
+
+使用IN和OUT的例子：
+```
+CREATE PROCEDURE ordertotal(
+	In onumber INT,
+	OUT ototal DECIMAL(8,2)
+)
+BEGIN
+	SELECT Sum(item_price*quantity)
+	FROM orderitems
+	WHERE order_num = onumber
+	INTO ototal;
+END;
+```
+
+onumber定义为IN，因为订单号被传入存储过程。ototal定义为out，因为要从存储过程返回合计。SELECT语句使用这两个参数，WHERE子句使用onumber选择正确的行，INTO使用ototal存储计算出来的合计。  
+调用这个新存储过程：
+```
+CALL ordertotal(20005, @total);
+```
+
+显示该合计：
+```
+SELECT @total
+```
+
+### 19.7 建立智能存储过程
+要做的事情：
+- 获得合计；
+- 把营业税有条件地添加到合计；
+- 返回合计。
+
+
+```
+-- Name: ordertotal
+-- Parameters: onumber = order number
+--             taxable = 0 if not taxable, 1 if taxable
+-- 				ototal = order total variable
+
+CREATE PROCEDURE ordertotal(
+	IN onumber INT,
+    IN taxable BOOLEAN,
+    OUT ototal DECIMAL(8,2)
+) COMMENT 'Obtain order total, optoinally adding tax'
+BEGIN	
+
+    -- Declare variable for total
+    DECLARE total DECIMAL (8, 2);
+    -- Declare tax percentage
+    DECLARE taxrate INT DEFAULT 6;
+    
+    -- Get the order total
+    SELECT Sum(item_price*quantity)
+    FROM orderitems
+    WHERE order_num = onumber
+    INTO total;
+    
+    -- Is this taxable
+    IF taxable THEN
+		SELECT total + (total/100*taxrate) INTO total;
+	END IF;
+    -- Finally save to out variable
+		SELECT total INTO ototal;
+	
+    END;
+```
+
+可以得到：
+```
+CALL ordertotal(20005,0,@total);
+SELECT @total;
+```
+
+得到结果149.87。
+```
+CALL ordertotal(20005,1,@total);
+SELECT @total;
+```
+
+得到结果158.86。
+
+检查存储过程，显示用来创建一个存储过程的CREATE语句：
+```
+SHOW CREATE PEOCEDURE ordertotal;
+```
+
+为了获得包括何时、由谁创建等详细信息的存储过程列表，使用SHOW PROCEDURE STATUS。
+
+> **限制过程状态结果**
+> 使用LIKE指定一个过滤模式：
+> ```
+> SHOW CREATE STATUS LIKE 'ordertotal';
+> ```
+
+
+
