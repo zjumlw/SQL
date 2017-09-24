@@ -9,7 +9,7 @@ SQL必知必会中重复的内容就不再出现了，重点在MySQL中的内容
 ### 9.2 使用MySQL正则表达式
 #### 9.2.1基本字符匹配
 检索列prod_name包含文本1000的所有行：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '1000'
@@ -20,7 +20,7 @@ REGEXP后面所跟的内容作为正则表达式处理。
 .是正则表达式语句中一个特殊字符，表示匹配任意一个字符。
 #### 9.2.2 进行OR匹配
 搜索两个串之一：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '1000|2000'
@@ -30,7 +30,7 @@ ORDER BY prod_name;
 |字符相当于SELECT语句中使用OR语句。
 #### 9.2.3 匹配几个字符之一
 通过指定一组用[]括起来的字符实现匹配特定字符：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '[123] Ton'
@@ -40,7 +40,7 @@ ORDER BY prod_name;
 []是另一种OR语句。
 #### 9.2.4 匹配范围
 用-来定义一个范围：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '[1-5] Ton'
@@ -49,7 +49,7 @@ ORDER BY prod_name;
 
 #### 9.2.5 匹配特殊字符
 为了匹配特殊字符，必须使用\\作为前导：
-```
+```sql
 SELECT vend_name
 FROM Vendors
 WHERE vend_name REGEXP '\\.'
@@ -62,7 +62,7 @@ ORDER BY vend_name;
 预定义的字符集称为字符类。
 #### 9.2.7 匹配多个实例
 利用正则表达式重复元字符：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '\\([0-9] sticks?\\)'
@@ -77,7 +77,7 @@ ORDER BY prod_name;
 {n,}：不少于指定数目的匹配  
 {n，m}：匹配数目的范围  
 匹配连在一起的4位数字：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '[[:digit:]]{4}'#{4}要求前面的字符出现4次
@@ -91,7 +91,7 @@ $：文本的结尾
 [[:<:]]：词的开始  
 [[:>:]]：词的结尾  
 检索以数（包括小数点开始的数）开始的所有产品：
-```
+```sql
 SELECT prod_name
 FROM products
 WHERE prod_name REGEXP '^[0-9\\.]'
@@ -108,7 +108,7 @@ LIKE和正则表达式很有用，但是有几个重要的限制：
 ### 18.2 使用全文本搜索
 #### 18.2.1 启用全文本搜索支持
 CREATE TABLE语句接受FULLTEXT子句，它给出被索引列的一个逗号分隔的列表。
-```
+```sql
 CREATE TABLE productnotes
 (
   note_id    int           NOT NULL AUTO_INCREMENT,
@@ -129,7 +129,7 @@ CREATE TABLE productnotes
 
 #### 18.2.2 进行全文本搜索
 使用函数Match()和Against()执行全文本搜索，其中Match()指定被搜索的列，Against()指定要使用的搜索表达式：
-```
+```sql
 SELECT note_text
 FROM productnotes
 WHERE Match(note_text) Against('rabbit');
@@ -143,7 +143,7 @@ Match(note_text)指示MySQL针对指定的列进行搜索，Against('rabbit')指
 > 除非使用BINARY方式，否则全文本搜索不区分大小写。
 
 也可以使用LIKE子句完成：
-```
+```sql
 SELECT note_text
 FROM productnotes
 WHERE note_text LIKE '%rabbit%';
@@ -161,14 +161,14 @@ WHERE note_text LIKE '%rabbit%';
 - MySQL再次进行全文本搜索，不仅使用原来的条件，还使用所有有用的词。
 
 首先是简单的全文本搜索：
-```
+```sql
 SELECT note_text
 FROM productnotes
 WHERE Match(note_text) Against('anvils');
 ```
 
 然后是使用查询扩展：
-```
+```sql
 SELECT note_text
 FROM productnotes
 WHERE Match(note_text) Against('anvils' WITH QUERY EXPANSION);
@@ -182,7 +182,7 @@ WHERE Match(note_text) Against('anvils' WITH QUERY EXPANSION);
 - 表达式分组；
 - 另外一些内容。
 
-```
+```sql
 SELECT note_text
 FROM productnotes
 WHERE Match(note_text) Against('heavy -rope*' IN BOOLEAN MODE);
@@ -222,7 +222,7 @@ MySQL检索操作返回一组称为结果集的行。
 
 #### 24.2.1 创建游标
 DECLARE命名游标，并定义相应的SELECT语句，根据需要带WHERE和其他子句：
-```
+```sql
 CREATE PROCEDURE processorders()
 BEGIN
 	DECLARE ordernumbers CURSOR
@@ -236,13 +236,13 @@ END;
 
 #### 24.2.2 打开和关闭游标
 OPEN CURSOR语句打开：
-```
+```sql
 OPEN ordernumbers;
 ```
 
 在处理OPEN语句时执行查询，存储检索出的数据以供浏览和滚动。  
 游标处理之后，关闭游标：
-```
+```sql
 CLOSE ordernumbers;
 ```
 
@@ -252,7 +252,7 @@ CLOSE释放游标使用的所有内部内存和资源，因此在每个游标不
 > **隐含关闭**
 > 如果不明确关闭游标，MySQL将会在到达END语句时自动关闭它。
 
-```
+```sql
 CREATE PROCEDURE processorders()
 BEGIN
 	DECLARE ordernumbers CURSOR
@@ -265,7 +265,7 @@ END;
 
 #### 24.2.3 使用游标数据
 使用FETCH语句分别访问每一行，指定检索什么数据，检索出来的数据存储在什么地方：
-```
+```sql
 CREATE PROCEDURE processorders()
 BEGIN
 	DECLARE o INT;
@@ -281,7 +281,8 @@ END;
 FETCH检索当前行的order_num列（自动从第一行开始）到一个名为o的局部声明的变量中，对检索出的数据不做处理。
 
 结合之前的内容，对取出的数据进行某种处理：
-```
+
+```sql
 CREATE DEFINER=`zjumlw`@`localhost` PROCEDURE `processorders`()
 BEGIN
 	-- Declare local variables
@@ -319,14 +320,16 @@ BEGIN
     UNTIL done END REPEAT;
     
     -- Close the cursor
-	CLOSE ordernumbers;
+	CLOSE ordernumbers
 END
 ```
 
+
 变量t存储每个订单的合计。创建新表ordertotals来保存存储过程生成的结果。FETCH取得每一个order_num，然后用CALL执行另一个存储过程来计算每个订单的带税的合计，最后用INSERT语句保存每个订单的订单号和合计。
 
-查看该表：
-```
+查看该表：  
+
+```sql
 call processorders();
 SELECT * from ordertotals
 GROUP BY total;
@@ -347,7 +350,7 @@ GROUP BY total;
 - 触发器何时执行（处理之前或之后）。
 
 使用CREATE TRIGGER语句创建触发器：
-```
+```sql
 CREATE  TRIGGER newproduct AFTER INSERT ON product
 FOR EACH ROW SELECT 'Product added';
 ```
@@ -361,7 +364,7 @@ FOR EACH ROW SELECT 'Product added';
 
 ### 25.3 删除触发器
 使用DROP TRIGGER删除触发器：
-```
+```sql
 DROP TRIGGER newproduct;;
 ```
 
@@ -375,13 +378,13 @@ DROP TRIGGER newproduct;;
 - 对于AUTO_INCREMENT列，NEW在INSERT执行之前包含0，在INSERT执行之后包含新的自动生成值。
 
 新生成值的方法：
-```
+```sql
 CREATE TRIGGER neworder AFTER INSERT ON orders
 FOR EACH ROW SELECT NEW.order_num INTO @tmp;
 ```
 
 测试该触发器：
-```
+```sql
 INSERT INTO orders(order_date, cust_id)
 VALUES(now(),10001);
 SELECT @tmp_num;
@@ -395,7 +398,7 @@ SELECT @tmp_num;
 - 在DELETE触发器代码内，可以引用一个名为OLD的虚拟表，访问被删除的行；
 - OLD中的值全都是只读的，不能更新。
 
-```
+```sql
 delimiter //
 CREATE TRIGGER deleteorder BEFORE DELETE ON orders
 FOR EACH ROW
@@ -417,7 +420,7 @@ delimiter ;
 - OLD中的值全都是只读的，不能更新。
 
 保证州名缩写总是大写：
-```
+```sql
 CREATE TRIGGER updatevendor BEFORE UPDATE ON vendors
 FOR EACH ROW SET NEW.vend_state = Upper(NEW.vend_state);
 ```
@@ -433,12 +436,12 @@ FOR EACH ROW SET NEW.vend_state = Upper(NEW.vend_state);
 
 ### 26.2 控制事务处理
 标识事务开始：
-```
+```sql
 START TRANSACTION
 ```
 
 #### 26.2.1 使用ROLLBACK
-```
+```sql
 SELECT * FROM ordertotals;
 START TRANSACTION
 DELETE FROM ordertotals;
@@ -454,7 +457,7 @@ ROLLBACK只能在一个事务处理内使用。
 #### 26.2.2 使用COMMIT
 一般的MySQL语句都是直接针对数据库表执行和编写的，这是隐含提交，是自动进行的。  
 在事务处理块中，进行明确的提交，使用COMMIT语句：
-```
+```sql
 START TRANSACTION
 DELETE FROM orderitems WHERE order_num = 20010;
 DELETE FROM order WHERE order_num = 20010;
@@ -467,14 +470,14 @@ COMMIT;
 #### 26.2.3 使用保留点
 复杂的事务处理可能需要部分提交或回退。  
 使用保留点SAVEPOINT：
-```
+```sql
 SAVEPOINT delete1;
 ```
 
 > 每个保留点取标识它的唯一名字。
 
 回退到保留点：
-```
+```sql
 ROLLBACK TO delete1;
 ```
 
@@ -485,7 +488,7 @@ ROLLBACK TO delete1;
 > 保留点在事务处理完成（执行一条ROLLBACK或COMMIT）后自动释放。也可以使用RELEASE SAVEPOINT来明确释放保留点。
 
 ####  26.2.4 更改默认的提交行为
-```
+```sql
 SET autocommit = 0;
 ```
 
@@ -503,19 +506,19 @@ SET autocommit = 0;
 
 ### 27.2 使用字符集和校对顺序
 查看所支持的字符集完整列表：
-```
+```sql
 SHOW CHARACTER SET;
 ```
 
 查看所支持校对的完整列表：
-```
+```sql
 SHOW COLLATION;
 ```
 
 有的字符集具有不止一种校对，区分大小写（_cs），不区分大小写（—_ci）。
 
 确定所用的字符集和校对，使用以下语句：
-```
+```sql
 SHOW VARIABLES LIKE 'character%';
 SHOW VARIABLES LIKE 'collation%';
 ```
@@ -531,26 +534,26 @@ MySQL服务器的安全基础：用户应该对他们需要的数据具有适当
 
 ### 28.2 管理用户
 MySQL用户帐号和信息存储在名为mysql的数据库中。需要直接访问它的时机之一是在需要获得所有用户帐号列表时：
-```
+```sql
 USE mysql;
 SELECT user FROM user;
 ```
 
 ### 28.2.1 创建用户帐号
 创建一个新用户帐号：
-```
+```sql
 CREATE USER ben IDENTIFIED BY 'P@$$word';
 ```
 
 创建用户帐号时不一定口令。  
 重命名一个用户账户，使用RENAME USER语句：
-```
+```sql
 RENAME USER ben To ftorta;
 ```
 
 #### 28.2.2 删除用户帐号
 使用DROP USER语句：
-```
+```sql
 DROP USER bforta;
 ```
 
@@ -559,7 +562,7 @@ DROP USER bforta;
 #### 28.2.3 设置访问权限
 新创建的用户帐号没有访问权限，可以登录MySQL但不能看到数据，不能执行任何数据库操作。  
 显示用户帐号的权限：
-```
+```sql
 SHOW GRANTS FOR bforta;
 ```
 
@@ -568,14 +571,14 @@ SHOW GRANTS FOR bforta;
 - 被授予访问权限的数据库或表；
 - 用户名。
 
-```
+```sql
 GRANT SELECT ON crashcourse.* TO bforta;
 ```
 
 允许用户使用SELECT语句，只有读访问权限。
 
 GRANT的反操作为REVOKE，用来撤销特定的权限：
-```
+```sql
 REVOKE SELECT ON crashcourse.* FROM bforta;
 ```
 
@@ -593,14 +596,14 @@ GRANT和REVOKE可在几个层次上控制访问权限：
 > 
 > **简化多次授权**
 > 可以列出个权限并用逗号分隔，将多条GRANT语句串在一起：
-> ```
-> GRANT SELECT, INSERT ON crashcourse.* TO bforta;
-> ```
+```sql
+GRANT SELECT, INSERT ON crashcourse.* TO bforta;
+```
 
 
 #### 28.2.4 更改口令 
 使用SET PASSWORD语句：
-```
+```sql
 SET PASSWORD FOR bforta = PASSWORD('afsd');
 ```
 
@@ -617,7 +620,7 @@ SET PASSWORD FOR bforta = PASSWORD('afsd');
 一下维护的语句：
 - ANALYZE TABLE，用来检测表键是否正确；
 
-```
+```sql
 ANALYZE TABLE orders;
 ```
 

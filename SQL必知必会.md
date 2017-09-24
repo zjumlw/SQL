@@ -55,7 +55,7 @@ SQL语句由关键字构成，最常用的是SELECT语句。
 使用SELECT检索表数据，至少需要给出两条信息：1.想选择什么，2.从什么地方选择。  
 ### 2.2 检索单个列
 使用SELECT：
-```
+```sql
 SELECT prod_name 
 FROM Products;
 ```  
@@ -65,13 +65,13 @@ FROM Products;
 
 ### 2.3 检索多个列  
 在select关键字后面给出多个列名，列名之间用逗号分隔：
-```
+```sql
 SELECT prod_id, prod_name, prod_price
 FROM Products;
 ```  
 ### 2.4 检索所有列  
 在实际列名的位置用星号代替：  
-``` 
+``` sql
 SELECT *  
 FROM Products;
 ```  
@@ -80,19 +80,19 @@ FROM Products;
 
 ### 2.5 检索不同的值  
 使用关键字DISTINCT（DISTINCT必须放在列名的前面）：  
-```
+```sql
 SELECT DISTINCT vend_id
 FROM Products;
 ```  
 ### 2.6 限制结果  
 只检索前5行，在MySQL中的实现：
-```
+```sql
 SELECT prod_name  
 FROM Products  
 LIMIT 5;
 ```  
 检索第5行开始的前5行，在MySQL中的实现：
-```
+```sql
 SELECT prod_name  
 FROM Products  
 LIMIT 5 OFFSET 5;
@@ -104,7 +104,7 @@ LIMIT 5 OFFSET 5;
 ### 2.7 使用注释  
 行内注释：  
 
-```
+```sql
 /*来一条注释*/
 SELECT prod_name
 FROM Products;
@@ -118,7 +118,7 @@ FROM Products;
 >一个子句由*1个*关键字和提供的数据组成。
 
 使用ORDER BY子句对输出按照字母顺序进行排序：
-```
+```sql
 SELECT prod_name
 FROM Products
 ORDER BY prod_name;
@@ -127,14 +127,14 @@ ORDER BY prod_name;
 这里应保证ORDER BY子句是SELECT语句中的最后一条子句，否则会出现错误。  
 ### 3.2 按多个列排序  
 指定列名，列名之间用逗号分开即可。以下首先按价格，然后按名称排序：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price, prod_name;
 ```
 ### 3.3 按列位置排序  
 ORDER BY支持按相对列位置进行排序：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY 2, 3;
@@ -142,13 +142,13 @@ ORDER BY 2, 3;
 得到的结果与上一个命令一样，好处在于不用重新输入列名，缺点有：1.不明确给出列名可能造成错误；2.对SELECT清单进行更改会影响数据排序；3.如果进行排序的列不在SELECT清单中，不能使用这项技术。  
 ### 3.4 指定排序方向  
 降序排序使用关键字DESC：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price DESC;
 ```  
 DESC关键字只应用到直接位于其前面的列名：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price DESC, prod_name;
@@ -157,7 +157,7 @@ ORDER BY prod_price DESC, prod_name;
 ## Chapter 4 过滤数据  
 ### 4.1 使用WHERE子句  
 检索所需数据需要指定搜索条件（过滤条件），数据根据WHERE子句中指定的搜索条件进行过滤，WHERE子句在表名（FROM子句）之后给出：
-```
+```sql
 SELECT prod_name, prod_price
 FROM Products
 WHERE prod_price = 3.49;
@@ -169,7 +169,7 @@ WHERE prod_price = 3.49;
 > 单引号用来限定字符串，数值不需要用引号。  
 
 使用BETWEEN必须指定两个值，低值和高值，并且用AND关键字分隔：
-```
+```sql
 SELECT prod_name, prod_price
 FROM Products
 WHERE prod_price BETWEEN 5 AND 10;
@@ -180,7 +180,7 @@ BETWEEN匹配范围内所有值，包括边界值。
 > 无值（no value），与字段包含0、空字符串或者空格不同。
 
 检查空值用IS NULL子句：  
-```
+```sql
 SELECT cust_name
 FROM Customers
 WHERE cust_email IS NULL;
@@ -192,19 +192,19 @@ SQL允许给出多个WHERE子句，以AND子句或者OR子句的方式使用。
 > 用来联结或改变WHERE子句中的子句的关键字，也称为逻辑操作符（logical operator）。
 
 通过AND操作符给WHERE子句附加条件实现对不止一个列进行过滤：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' AND prod_price <= 4;
 ```
 通过OR操作符给WHERE子句附加条件实现匹配任一条件的行：
-```
+```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
 ```  
 AND操作符优先级大于OR操作符，可以用圆括号对操作符进行明确分组：
-```
+```sql
 SELECT prod_name, prod_price
 FROM Products
 WHERE (vend_id = 'DLL01' OR vend_id = 'BRS01') 
@@ -212,7 +212,7 @@ AND prod_price > 10;
 ```
 ### 5.2 IN操作符  
 IN操作符用来指定条件范围，范围中的每个条件都可以进行匹配：
-```
+```sql
 SELECT prod_name, prod_price
 FROM Products
 WHERE vend_id IN ('DLL01', 'BRS01')
@@ -228,7 +228,7 @@ ORDER BY prod_name;
 
 ### 5.3 NOT操作符  
 有且只有一个功能：否定其后所跟的任何条件：
-```
+```sql
 SELECT prod_name
 FROM Products
 WHERE NOT vend_id = 'DLL01'
@@ -250,7 +250,7 @@ NOT从不单独使用，用在要过滤的列前，而不是在其后。
 
 使用LIKE操作符指示DBMS后面的搜索模式利用通配符而不是简单的相等匹配进行比较。
 %通配符：表示任何字符出现任意次数：
-```
+```sql
 SELECT prod_id, prod_name
 FROM Products
 WHERE prod_name LIKE 'FISH%';
@@ -280,13 +280,13 @@ _通配符：只匹配单个字符，而不是多个字符。
 > 将值联结一起构成单个值。
 
 操作符可用加号（+）或者两个竖杠（||），在MySQL中必须使用特殊的函数Concate：
-```
+```sql
 SELECT Concat(vend_name,'(',vend_country,')')
 FROM Vendors
 ORDER BY vend_name;
 ```
 新计算列并没有名字，可以用别名关键字AS赋予名字：
-```
+```sql
 SELECT Concat(vend_name,'(',vend_country,')')
        AS vend_title
 FROM Vendors
@@ -297,7 +297,7 @@ ORDER BY vend_name;
 
 ### 7.3 执行算术计算
 对检索出的数据进行算术计算：
-```
+```sql
 SELECT prod_id, quantity, item_price, 
 	   quantity*item_price AS expanded_price
 FROM Orderitems
@@ -321,7 +321,7 @@ RTRIM()函数：去除字符串右边的空格。
 LTRIM()函数：去掉字符串左边的空格。  
 LOWER()函数：将文本转换为小写。  
 UPPER()函数：将文本转换为大写：  
-```
+```sql
 SELECT vend_name, UPPER(vend_name) AS vend_name_upcase
 FROM Vendors
 ORDER BY vend_name;
@@ -337,7 +337,7 @@ SOUNDEX()函数：返回字符串的SOUNDEX值。
 #### 8.2.2 日期和时间处理函数
 日期和时间函数总是用来读取、统计和处理日期和时间，可移植性最差。
 MySQL中可以用year()函数来提取日期中的年份：
-```
+```sql
 SELECT order_num
 FROM Orders
 WHERE YEAR(order_date) = 2012;
@@ -363,7 +363,7 @@ TAN() 正切
 > 对某些行运行的函数，计算并返回一个值。
 
 AVG() 返回某列的平均值：
-```
+```sql
 SELECT AVG(prod_price) AS avg_price
 FROM Products
 WHERE vend_id = 'DLL01';
@@ -377,12 +377,12 @@ SUM()返回某列值之和。
 
 COUNT()确定表中行的数目或符合特定条件的行的数目。
 对所有行计数：
-```
+```sql
 SELECT COUNT(*) AS num_cust
 FROM Customers;
 ```
 对有email的行计数：
-```
+```sql
 SELECT COUNT(cust_email) AS num_cust
 FROM Customers;
 ```
@@ -390,7 +390,7 @@ FROM Customers;
 > 如果指定列名，则COUNT()会忽略指定列的值为NULL的行，如果是COUNT(*)则不忽略。
 
 MAX()返回指定列中的最大值，要指定列名：
-```
+```sql
 SELECT MAX(prod_price) AS max_price
 FROM Products;
 ```
@@ -398,7 +398,7 @@ MAX()忽略列值为NULL的行。
 用于文本数据时，MAX()返回按该列排序后的最后一行。
 
 MIN()返回指定列中的最小值，要指定列名：
-```
+```sql
 SELECT MIN(prod_price) AS min_price
 FROM Products;
 ```
@@ -407,7 +407,7 @@ MIN()忽略列值为NULL的行。
 
 SUM()返回求和。
 得到所有物品价格之和：
-```
+```sql
 SELECT SUM(quantity*item_price) AS total_price
 FROM OrderItems
 WHERE order_num = 20005;
@@ -417,7 +417,7 @@ WHERE order_num = 20005;
 - 对所有行执行计算，指定ALL参数或者不指定参数；
 - 只包含不同的值，指定DISTINCT参数：
 
-```
+```sql
 SELECT AVG(DISTINCT prod_price) AS avg_price
 FROM Products
 WHERE vend_id = 'DLL01';
@@ -425,7 +425,7 @@ WHERE vend_id = 'DLL01';
   
 ### 9.3 组合聚集函数  
 SELECT语句可以根据需要包含多个聚集函数，用逗号隔开：
-```
+```sql
 SELECT COUNT(*) AS num_items,
 	   MIN(prod_price) AS price_min,
 	   MAX(prod_price) AS price_max,
@@ -440,7 +440,7 @@ FROM Products;
 使用分组可以将数据分为多个逻辑组，对每个组进行聚集计算。
 ### 10.2 创建分组
 使用SELECT语句的GROUP BY子句建立：
-```
+```sql
 SELECT vend_id, COUNT(*) AS num_prods
 FROM Products
 GROUP BY vend_id;
@@ -456,7 +456,7 @@ GROUP BY的一些重要规定：
 - GROUP BY子句必须出现在WHERE子句之后，ORDER BY子句之前。
 
 可以使用WITH ROLLUP关键字得到汇总信息：
-```
+```sql
 SELECT vend_id, COUNT(*) AS num_prods
 FROM Products
 GROUP BY vend_id WITH ROLLUP;
@@ -466,7 +466,7 @@ GROUP BY vend_id WITH ROLLUP;
 ### 10.3 过滤分组
 过滤分组规定包括哪些分组，排除哪些分组。
 HAVING子句过滤分组，WHERE子句过滤行：
-```
+```sql
 SELECT cust_id, COUNT(*) AS orders
 FROM Orders
 GROUP BY cust_id
@@ -476,7 +476,7 @@ HAVING COUNT(*) >=2;
 > **HAVING和WHERE的差别**
 > WHERE在分组前进行过滤，HAVING在分组后进行过滤。WHERE排除的行不在分组中。
 
-```
+```sql
 SELECT vend_id, COUNT(*) AS num_prods
 FROM Products
 WHERE prod_price >=4
@@ -496,7 +496,7 @@ HAVING COUNT(*) >=2;
 
 
 检索包含三个或更多物品的订单号和订单物品的数目，按照订购物品的数目排序输出：
-```
+```sql
 SELECT order_num, COUNT(*) AS items
 FROM OrderItems
 GROUP BY order_num
@@ -521,7 +521,7 @@ SQL允许建立子查询，就是嵌套在其他查询中的查询。
 ### 11.2 利用子查询进行过滤
 问题：检索出订购物品RGAN01的所有顾客  
 1.检索包含物品RGAN01的所有订单的编号：
-```
+```sql
 SELECT order_num
 FROM OrderItems
 WHERE prod_id = 'RGAN01';
@@ -529,14 +529,14 @@ WHERE prod_id = 'RGAN01';
 
 得到订单编号是：20007， 20008；
 2.检索具有前一步列出的订单编号的所有顾客的ID：
-```
+```sql
 SELECT cust_id
 FROM Orders
 WHERE order_num in(20007, 20008);
 ```
 
 结合1和2步骤：
-```
+```sql
 SELECT cust_id
 FROM Orders
 WHERE order_num in(SELECT order_num
@@ -546,7 +546,7 @@ WHERE order_num in(SELECT order_num
 
 在SELECT语句中，子查询总是从内向外处理。
 3.检索前一步返回的所有顾客ID的顾客信息：
-```
+```sql
 SELECT cust_name, cust_contact
 FROM Customers
 WHERE cust_id IN(SELECT cust_id
@@ -564,7 +564,7 @@ WHERE order_num in(SELECT order_num
 1. 从Customers表中检索顾客列表；
 2. 对于检索出的每个顾客，统计其在Orders表中的订单数目。
 
-```
+```sql
 SELECT cust_name, cust_state,
 		(SELECT COUNT(*)
 		FROM Orders
@@ -590,7 +590,7 @@ SQL最强大的功能之一就是能在数据查询的执行中联结（join）�
 SELECT语句通过联结检索出存储在多个表中的数据。
 ### 12.2 创建联结
 指定要联结的所有表以及关联它们的方式即可：
-```
+```sql
 SELECT vend_name, prod_name, prod_price
 FROM Vendors, Products
 WHERE Vendors.vend_id = Products.vend_id;
@@ -606,14 +606,14 @@ WHERE Vendors.vend_id = Products.vend_id;
 > 没有联结条件的表关系返回的结果是笛卡尔积，是第一个表的行数乘以第二个表的行数。该联结也成为叉联结（cross join）。
 
 以上的联结称为等值联结（equijoin），也称为内联结（inner join）。可以明确指定联结的类型：
-```
+```sql
 SELECT vend_name, prod_name, prod_price
 FROM Vendors INNER JOIN Products
 ON Vendors.vend_id = Products.vend_id;
 ```  
 得到结果与上个SELECT语句一样。
 SELECT语句可以联结多个表，联结的基本规则相同：首先列出所有表，然后定义表之间的关系：
-```
+```sql
 SELECT prod_name, vend_name, prod_price, quantity
 FROM OrderItems, Products, Vendors
 WHERE Products.vend_id = Vendors.vend_id
@@ -624,7 +624,7 @@ WHERE Products.vend_id = Vendors.vend_id
 > 不要联结不必要的表，联结的表越多，性能下降越厉害。
 
 对于Chapter 11中的子查询，使用联结可以实现相同的功能：
-```
+```sql
 SELECT cust_name, cust_contact
 FROM Customers, Orders, OrderItems
 WHERE Customers.cust_id = Orders.cust_id
@@ -635,7 +635,7 @@ WHERE Customers.cust_id = Orders.cust_id
 ## Chapter 13 创建高级联结
 ### 13.1 使用表别名
 SQL除了可以给列名和计算字段使用别名，还允许给表名起别名，可以：缩短SQL语句；允许在一条SELECT语句中多次使用相同的表。  
-```
+```sql
 SELECT cust_name,cust_contact
 FROM Customers AS C, Orders AS O, OrderItems AS OI
 WHERE C.cust_id = O.cust_id
@@ -647,7 +647,7 @@ WHERE C.cust_id = O.cust_id
 ### 13.2 使用不同类型的联结
 #### 13.2.1 自联结
 在一条SELECT语句中不止一次引用相同的表：
-```
+```sql
 SELECT cust_id, cust_name, cust_contact
 FROM Customers
 WHERE cust_name = (SELECT cust_name
@@ -656,7 +656,7 @@ WHERE cust_name = (SELECT cust_name
 ```
 
 这是利用子查询的做法，还有：
-```
+```sql
 SELECT c1.cust_id, c1.cust_name, c1.cust_contact
 FROM Customers AS c1, Customers AS c2
 WHERE c1.cust_name = c2.cust_name
@@ -670,7 +670,7 @@ SELECT语句使用c1前缀明确给出所需列的全名，如果不这样，DBM
 #### 13.2.2 自然联结
 标准的联结返回所有数据，相同的列甚至多次出现。自然联结排除多次出现，使每一列只返回一次。  
 自然联结要求只能选择哪些唯一的列，一般通过对一个表使用通配符（SELECT *），而对其他表的列使用明确的子集来完成：
-```
+```sql
 SELECT C.*, O.order_num, O.order_date,
 	OI.prod_id, OI.quantity, OI.item.price
 FROM Customers AS C, Orders AS O, OrderItems AS OI
@@ -682,14 +682,14 @@ WHERE C.cust_id = O.cust_id
 #### 13.2.3 外联结
 许多联结将一个表中的行与另一个表中的行相关联，但有时候需要包含没有关联行的那些行，称为外联结。  
 内联结：
-```
+```sql
 SELECT Customers.cust_id, Orders.order_num
 FROM Customers INNER JOIN Orders
 ON Customers.cust_id = Orders.cust_id;
 ```
 
 外联结：
-```
+```sql
 SELECT Customers.cust_id, Orders.order_num
 FROM Customers LEFT OUTER JOIN Orders
 ON Customers.cust_id = Orders.cust_id;
@@ -698,7 +698,7 @@ ON Customers.cust_id = Orders.cust_id;
 外联结可以检索包括没有订单顾客在内的所有顾客。LEFT关键字指定包括其所有行的表。
 
 全联结（MySQL不支持）：
-```
+```sql
 SELECT Customers.cust_id, Orders.order_num
 FROM Customers FULL OUTER JOIN Orders
 ON Customers.cust_id = Orders.cust_id;
@@ -707,7 +707,7 @@ ON Customers.cust_id = Orders.cust_id;
 ### 13.3 使用带聚集函数的联结
 聚集函数可以和联结一起使用。  
 检索所有顾客及每个顾客所下的订单数：
-```
+```sql
 SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
 FROM Customers INNER JOIN Orders
 ON Customers.cust_id = Orders.cust_id
@@ -715,7 +715,7 @@ GROUP By Customers.cust_id;
 ```
 
 还有
-```
+```sql
 SELECT Customers.cust_id, COUNT(Orders.order_num) AS num_ord
 FROM Customers LEFT OUTER JOIN Orders
 ON Customers.cust_id = Orders.cust_id
@@ -744,20 +744,20 @@ SQL允许执行多个查询，并将结果作为一个查询结果集返回，�
 #### 14.2.1 使用UNION
 给出每条SELECT语句，在各条语句之间放上关键字UNION。
 单条语句：
-```
+```sql
 SELECT cust_name, cust_contact, cust_email
 FROM Customers
 WHERE cust_state IN('IL', 'IN', 'MI');
 ```
 
-```
+```sql
 SELECT cust_name, cust_contact, cust_email, cust_state
 FROM Customers
 WHERE cust_name = 'Fun4All';
 ```
 
 结合两条语句：
-```
+```sql
 SELECT cust_name, cust_contact, cust_email
 FROM Customers
 WHERE cust_state IN('IL', 'IN', 'MI')
@@ -769,7 +769,7 @@ WHERE cust_name = 'Fun4All';
 
 DBMS执行这两条SELECT语句，并把输出组合成一个查询结果集。  
 如果使用WHERE子句而不是UNION：
-```
+```sql
 SELECT cust_name, cust_contact, cust_email
 FROM Customers
 WHERE cust_state IN('IL', 'IN', 'MI')
@@ -789,7 +789,7 @@ OR cust_name = 'Fun4All';
 
 #### 14.2.4 对组合查询结果排序
 ORDER BY必须位于最后一条SELECT语句之后。
-```
+```sql
 SELECT cust_name, cust_contact, cust_email
 FROM Customers
 WHERE cust_state IN('IL', 'IN', 'MI')
@@ -811,7 +811,7 @@ ORDER BY cust_name, cust_contact;
 
 #### 15.1.1 插入完整的行
 INSERT语法，要求指定表名和插入到新行中的值：
-```
+```sql
 INSERT INTO Customers
 VALUES('1000000006',
 'Toy Land', 
@@ -833,7 +833,7 @@ NULL)
 
 #### 15.1.2 插入部分行
 给出表的列名，可以只给某些列提供值，给其他列不提供值。
-```
+```sql
 INSERT INTO Customers(cust_id,
 					cust_name)
 VALUES('100005',
@@ -854,7 +854,7 @@ INSERT SELECT中SELECT语句可以包含WHERE子句，以过滤插入的数据�
 ### 15.2 从一个表复制到另一个表
 使用SELECT INTO语句。
 MySQL中：
-```
+```sql
 CREATE TABLE CustCopy AS
 SELECT * FROM Customers;
 ```
@@ -876,7 +876,7 @@ UPDATE语句由三部分组成：
 - 确定要更新哪些行的过滤条件。  
 
 UPDATE语句总是以要更新的表名开始：
-```
+```sql
 UPDATE Customers
 SET cust_email = 'gg@gmail.com'
 WHERE cust_id = '1000000005';
@@ -884,7 +884,7 @@ WHERE cust_id = '1000000005';
 
 如果没有WHERE子句，则会用这个email更新Customers表中所有的行。  
 更新多个列：
-```
+```sql
 UPDATE Customers
 SET cust_contact = 'Sam Will',
 	cust_email = 'samnice@gmail.com'
@@ -905,7 +905,7 @@ WHERE cust_id = '1000000006';
 > 如果不小心可能会删除表中所有行。
 
 删除一行：
-```
+```sql
 DELETE FROM Customers
 WHERE cust_id = '1000000006';
 ```
@@ -935,7 +935,7 @@ WHERE cust_id = '1000000006';
 - 有些DBMS需要指定表的位置。
 
 创建Products：
-```
+```sql
 CREATE TABLE Products
 (
 	prod_id	char(10) NOT NULL,
@@ -952,7 +952,7 @@ CREATE TABLE Products
 
 #### 17.1.2 使用NULL值
 NULL值就是没有值或缺值。允许NULL值的列允许在插入行时不给出该列的值，反之则不允许。每个表列要么时NULL列，要么是NOT NULL列，在创建时由表的定义规定：
-```
+```sql
 CREATE TABLE Orders
 (
 	order_num INTEGER NOT NULL,
@@ -963,7 +963,7 @@ CREATE TABLE Orders
 ```
 
 下面混合NULL和NOT NULL列的表：
-```
+```sql
 CREATE TABLE Vendors
 (
 	vend_id char(10) NOT NULL,
@@ -979,7 +979,7 @@ CREATE TABLE Vendors
 
 #### 17.1.3 指定默认值
 如果插入行时不给出值，则使用默认值，就是在CREATE TABLE语句的列定义中用了关键字DEFAULT指定的值：
-```
+```sql
 CREATE TABLE OrderItems
 (
 	order_num int NOT NULL,
@@ -1020,19 +1020,19 @@ MySQL中有多个引擎，它们具有各自不同的功能和特性，为不同
 - 列出要做哪些更改。
 
 给表添加一个列：
-```
+```sql
 ALTER TABLE vendors
 ADD vend_phone char(20);
 ```
 
 删除该列：
-```
+```sql
 ALTER TABLE vendors
 DROP COLUMN vend_phone;
 ```
 
 ALTER TABLE常见用途是定义主键、外键：
-```
+```sql
 ALTER TABLE Customers ADD PRIMARY KEY (cust_id);
 ALTER TABLE OrderItems 
 ADD CONSTRAINT FK_OrderItems_Orders 
@@ -1049,13 +1049,13 @@ FOREIGN KEY (order_num) REFERENCES Orders (order_num);
 
 ### 17.3 删除表
 使用DROP TABLE语句：
-```
+```sql
 DROP TABLE CustCopy;
 ```
 
 ### 17.4 重命名表
 RENAME TABLE语句实现：
-```
+```sql
 RENAME TABLE customers2 TO customers,
 			backup_vendors TO vendors;
 ```
@@ -1089,7 +1089,7 @@ RENAME TABLE customers2 TO customers,
 
 #### 18.2.1 利用视图简化复杂的联结
 隐藏复杂的SQL：
-```
+```sql
 CREATE VIEW ProductCustomers AS
 SELECT cust_name, cust_contact, prod_id
 FROM Customers, Orders, OrderItems
@@ -1098,7 +1098,7 @@ WHERE Customers.cust_id = Orders.cust_id
 ```
 
 ProductCustomer时视图联结了三个表，返回已订购任意产品的所有顾客的列表。可以用来查询特定的信息：
-```
+```sql
 SELECT * FROM ProductCustomers
 WHERE prod_id = 'RGAN01';
 ```
@@ -1109,7 +1109,7 @@ WHERE prod_id = 'RGAN01';
 #### 18.2.2 用视图重新格式化检索出的数据
 重新格式化检索出的数据。  
 返回供应商名和位置：
-```
+```sql
 SELECT Concat(RTRIM(vend_name),'(',RTRIM(vend_country),')')
 	AS vend_title
 FROM Vendors
@@ -1117,7 +1117,7 @@ ORDER BY vend_name;
 ```
 
 如果经常需要这个格式的结果，可以把此语句转换为视图：
-```
+```sql
 CREATE VIEW VendorLocation AS
 SELECT Concat(RTRIM(vend_name),'(',RTRIM(vend_country),')')
 	AS vend_title
@@ -1127,7 +1127,7 @@ ORDER BY vend_name;
 
 #### 18.2.3 用视图过滤不想要的数据
 定义CustomerEMailList视图过滤没有电子邮件地址的顾客：
-```
+```sql
 CREATE VIEW CustomerEMailList AS
 SELECT cust_id, cust_name, cust_email
 FROM Customers
@@ -1137,7 +1137,7 @@ Where cust_email IS NOT NULL;
 #### 18.2.4 使用视图与计算字段
 简化计算字段的使用。  
 计算每种物品的总价格：
-```
+```sql
 SELECT prod_id, quantity, item_price,
 	quantity*item_price AS expanded_price
 FROM OrderItems
@@ -1145,7 +1145,7 @@ WHERE order_num = 20008;
 ```
 
 将其转换为视图：
-```
+```sql
 CREATE VIEW OrderItemsExpanded AS
 SELECT prod_id, quantity, item_price,
 	quantity*item_price AS expanded_price
@@ -1185,7 +1185,7 @@ MySQL不能正确地确定被更新的基数据，则不允许更新。
 
 ### 19.3 执行存储过程
 使用EXECUTE接受存储过程名和需要传递给它的任何参数：
-```
+```sql
 EXECUTE AddNewProduct('JTS01',
 				'Stuffed Eiffel Tower',
 				6.49,
@@ -1194,14 +1194,14 @@ EXECUTE AddNewProduct('JTS01',
 ```
 
 MySQL中执行存储过程的语句为CALL，接受存储过程的名字以及需要传递给它的任意参数。
-```
+```sql
 CALL productpricing(@pricelow,
 					@pricehigh,
 					@priceaverage);
 ```
  
 ### 19.4 创建存储过程
-```
+```sql
 CREATE PROCEDURE productpricing()
 BEGIN
 	SELECT Avg(prod_price) AS priceaverage
@@ -1215,7 +1215,7 @@ END;
 
 ### 19.5 删除存储过程
 存储过程在创建之后，被保存在服务器上以供使用，直至被删除。删除命令从服务器中删除存储过程：
-```
+```sql
 DROP PROCEDURE productpricing;
 ```
 
@@ -1229,7 +1229,7 @@ DROP PROCEDURE IF EXISTS。
 > 变量
 > 内存中一个特定的变量，用来临时存储数据。
 
-```
+```sql
 CREATE PROCEDURE productpricing(
 			OUT pl DECIMAL(8,2),
 			OUT ph DECIMAL(8,2),
@@ -1251,24 +1251,24 @@ END;
 存储过程接受3个参数：pl存储产品最低价格，ph存储最高价格，pa存储平均价格。每个参数必须具有指定的类型，这里使用十进制值。  
 关键字OUT指出相应的参数用来存储过程中传出的一个值。IN传递给存储过程，INOUT对存储过程传入和传出。  
 为调用此修改过的存储过程，必须指定3个变量名：
-```
+```sql
 CALL productpricing(@pricelow,
 					@pricehigh,
 					@priceaverage);
 ```
 
 CALL语句给出的三个参数是存储过程将保存结果的3个变量的名字。该语句不显示任何数据。检索平均价格：
-```
+```sql
 SELECT @priceaverage;
 ```
 
 检索3个值：
-```
+```sql
 SELECT @pricehigh, @pricelow, @priceaverage;
 ```
 
 使用IN和OUT的例子：
-```
+```sql
 CREATE PROCEDURE ordertotal(
 	In onumber INT,
 	OUT ototal DECIMAL(8,2)
@@ -1283,12 +1283,12 @@ END;
 
 onumber定义为IN，因为订单号被传入存储过程。ototal定义为out，因为要从存储过程返回合计。SELECT语句使用这两个参数，WHERE子句使用onumber选择正确的行，INTO使用ototal存储计算出来的合计。  
 调用这个新存储过程：
-```
+```sql
 CALL ordertotal(20005, @total);
 ```
 
 显示该合计：
-```
+```sql
 SELECT @total
 ```
 
@@ -1299,7 +1299,7 @@ SELECT @total
 - 返回合计。
 
 
-```
+```sql
 -- Name: ordertotal
 -- Parameters: onumber = order number
 --             taxable = 0 if not taxable, 1 if taxable
@@ -1334,13 +1334,13 @@ BEGIN
 ```
 
 可以得到：
-```
+```sql
 CALL ordertotal(20005,0,@total);
 SELECT @total;
 ```
 
 得到结果149.87。
-```
+```sql
 CALL ordertotal(20005,1,@total);
 SELECT @total;
 ```
@@ -1348,7 +1348,7 @@ SELECT @total;
 得到结果158.86。
 
 检查存储过程，显示用来创建一个存储过程的CREATE语句：
-```
+```sql
 SHOW CREATE PEOCEDURE ordertotal;
 ```
 
