@@ -45,7 +45,7 @@ SQL的优点：
 - 不是某个特定数据库供应商专有的语言，具有通用性；  
 - 简单易学；  
 - 灵活使用其语言元素，可以进行非常复杂和高级的数据库操作。 
- 
+
 ## Chapter 2 检索数据  
 ### 2.1 SELECT语句  
 SQL语句由关键字构成，最常用的是SELECT语句。
@@ -58,7 +58,7 @@ SQL语句由关键字构成，最常用的是SELECT语句。
 ```sql
 SELECT prod_name 
 FROM Products;
-```  
+```
 >多条SQL语句必须以分号分隔；  
 >SQL语句不区分大小写，表名、列名和值可能区分大小写；  
 >所有的空格都被忽略，可以写在一行也可以分行。  
@@ -68,13 +68,13 @@ FROM Products;
 ```sql
 SELECT prod_id, prod_name, prod_price
 FROM Products;
-```  
+```
 ### 2.4 检索所有列  
 在实际列名的位置用星号代替：  
 ``` sql
 SELECT *  
 FROM Products;
-```  
+```
 
 > 使用星号通配符可以检索出名字未知的列。  
 
@@ -83,20 +83,20 @@ FROM Products;
 ```sql
 SELECT DISTINCT vend_id
 FROM Products;
-```  
+```
 ### 2.6 限制结果  
 只检索前5行，在MySQL中的实现：
 ```sql
 SELECT prod_name  
 FROM Products  
 LIMIT 5;
-```  
+```
 检索第5行开始的前5行，在MySQL中的实现：
 ```sql
 SELECT prod_name  
 FROM Products  
 LIMIT 5 OFFSET 5;
-```  
+```
 > 第一个被检索的是第0行而不是第1行，因此LIMIT 1 OFFSET 1会检索第2行而不是第一行。  
 > 在MySQL中，LIMIT 3，4 == LIMIT 4 OFFSET 3  
 
@@ -109,7 +109,7 @@ LIMIT 5 OFFSET 5;
 SELECT prod_name
 FROM Products;
 #这是一条注释
-```  
+```
 
 ## Chapter 3 排序检索数据  
 ### 3.1 排序数据  
@@ -122,7 +122,7 @@ FROM Products;
 SELECT prod_name
 FROM Products
 ORDER BY prod_name;
-```  
+```
 
 这里应保证ORDER BY子句是SELECT语句中的最后一条子句，否则会出现错误。  
 ### 3.2 按多个列排序  
@@ -138,7 +138,7 @@ ORDER BY支持按相对列位置进行排序：
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY 2, 3;
-```  
+```
 得到的结果与上一个命令一样，好处在于不用重新输入列名，缺点有：1.不明确给出列名可能造成错误；2.对SELECT清单进行更改会影响数据排序；3.如果进行排序的列不在SELECT清单中，不能使用这项技术。  
 ### 3.4 指定排序方向  
 降序排序使用关键字DESC：
@@ -146,13 +146,13 @@ ORDER BY 2, 3;
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price DESC;
-```  
+```
 DESC关键字只应用到直接位于其前面的列名：
 ```sql
 SELECT prod_id, prod_price, prod_name
 FROM Products
 ORDER BY prod_price DESC, prod_name;
-```  
+```
 这里先按照price降序，再按照name升序。  
 ## Chapter 4 过滤数据  
 ### 4.1 使用WHERE子句  
@@ -161,7 +161,7 @@ ORDER BY prod_price DESC, prod_name;
 SELECT prod_name, prod_price
 FROM Products
 WHERE prod_price = 3.49;
-```  
+```
 > 在同时使用ORDER BY和WHERE子句时，应该让ORDER BY位于WHERE之后，否则会产生错误。 
 
 ### 4.2 WHERE子句操作符  
@@ -173,7 +173,7 @@ WHERE prod_price = 3.49;
 SELECT prod_name, prod_price
 FROM Products
 WHERE prod_price BETWEEN 5 AND 10;
-```  
+```
 BETWEEN匹配范围内所有值，包括边界值。
 在一个列不包含值时，称其包含空值NULL。
 > **NULL**  
@@ -184,7 +184,7 @@ BETWEEN匹配范围内所有值，包括边界值。
 SELECT cust_name
 FROM Customers
 WHERE cust_email IS NULL;
-```  
+```
 ## Chapter 5 高级数据过滤  
 ### 5.1 组合WHERE子句  
 SQL允许给出多个WHERE子句，以AND子句或者OR子句的方式使用。
@@ -202,7 +202,7 @@ WHERE vend_id = 'DLL01' AND prod_price <= 4;
 SELECT prod_id, prod_price, prod_name
 FROM Products
 WHERE vend_id = 'DLL01' OR vend_id = 'BRS01';
-```  
+```
 AND操作符优先级大于OR操作符，可以用圆括号对操作符进行明确分组：
 ```sql
 SELECT prod_name, prod_price
@@ -217,7 +217,7 @@ SELECT prod_name, prod_price
 FROM Products
 WHERE vend_id IN ('DLL01', 'BRS01')
 ORDER BY prod_name;
-```  
+```
 与OR有相同的功能，有如下优点：
 
 
@@ -233,7 +233,7 @@ SELECT prod_name
 FROM Products
 WHERE NOT vend_id = 'DLL01'
 ORDER BY prod_name;
-```  
+```
 NOT从不单独使用，用在要过滤的列前，而不是在其后。
 > **NOT**  
 > WHERE子句中用来否定其后条件的关键字。
@@ -422,7 +422,7 @@ SELECT AVG(DISTINCT prod_price) AS avg_price
 FROM Products
 WHERE vend_id = 'DLL01';
 ```
-  
+
 ### 9.3 组合聚集函数  
 SELECT语句可以根据需要包含多个聚集函数，用逗号隔开：
 ```sql
@@ -476,7 +476,7 @@ HAVING COUNT(*) >=2;
 > **HAVING和WHERE的差别**
 > WHERE在分组前进行过滤，HAVING在分组后进行过滤。WHERE排除的行不在分组中。
 
-```sql
+```mysql
 SELECT vend_id, COUNT(*) AS num_prods
 FROM Products
 WHERE prod_price >=4
@@ -594,7 +594,7 @@ SELECT语句通过联结检索出存储在多个表中的数据。
 SELECT vend_name, prod_name, prod_price
 FROM Vendors, Products
 WHERE Vendors.vend_id = Products.vend_id;
-```   
+```
 
 这里FROM子句列出了两个表：Vendors和Products，这就是联结的两个表。WHERE子句指示DBMS将Vendors表中的vend_id与Products表中的vend_id匹配起来。  
 
@@ -610,7 +610,7 @@ WHERE Vendors.vend_id = Products.vend_id;
 SELECT vend_name, prod_name, prod_price
 FROM Vendors INNER JOIN Products
 ON Vendors.vend_id = Products.vend_id;
-```  
+```
 得到结果与上个SELECT语句一样。
 SELECT语句可以联结多个表，联结的基本规则相同：首先列出所有表，然后定义表之间的关系：
 ```sql
@@ -619,7 +619,7 @@ FROM OrderItems, Products, Vendors
 WHERE Products.vend_id = Vendors.vend_id
 	AND OrderItems.prod_id = Products.prod_id
 	AND order_num = 20007;
-```  
+```
 这里WHERE子句定义了两个联结条件对于三个表，第三个联结条件用来过滤订单20007中的物品。
 > 不要联结不必要的表，联结的表越多，性能下降越厉害。
 
@@ -630,7 +630,7 @@ FROM Customers, Orders, OrderItems
 WHERE Customers.cust_id = Orders.cust_id
 	AND OrderItems.order_num = Orders.order_num
 	AND prod_id = 'RGAN01';
-```  
+```
 
 ## Chapter 13 创建高级联结
 ### 13.1 使用表别名
@@ -695,7 +695,7 @@ FROM Customers LEFT OUTER JOIN Orders
 ON Customers.cust_id = Orders.cust_id;
 ```
 
-外联结可以检索包括没有订单顾客在内的所有顾客。LEFT关键字指定包括其所有行的表。
+外联结可以**检索包括没有订单顾客在内的所有顾客**。LEFT关键字指定包括其所有行的表。
 
 全联结（MySQL不支持）：
 ```sql
@@ -1185,6 +1185,7 @@ MySQL不能正确地确定被更新的基数据，则不允许更新。
 
 ### 19.3 执行存储过程
 使用EXECUTE接受存储过程名和需要传递给它的任何参数：
+
 ```sql
 EXECUTE AddNewProduct('JTS01',
 				'Stuffed Eiffel Tower',
@@ -1194,13 +1195,15 @@ EXECUTE AddNewProduct('JTS01',
 ```
 
 MySQL中执行存储过程的语句为CALL，接受存储过程的名字以及需要传递给它的任意参数。
+
 ```sql
 CALL productpricing(@pricelow,
 					@pricehigh,
 					@priceaverage);
 ```
- 
+
 ### 19.4 创建存储过程
+
 ```sql
 CREATE PROCEDURE productpricing()
 BEGIN
@@ -1215,6 +1218,7 @@ END;
 
 ### 19.5 删除存储过程
 存储过程在创建之后，被保存在服务器上以供使用，直至被删除。删除命令从服务器中删除存储过程：
+
 ```sql
 DROP PROCEDURE productpricing;
 ```
